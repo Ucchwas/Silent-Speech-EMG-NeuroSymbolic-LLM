@@ -1,12 +1,10 @@
 # EMG Silent Speech with NeuroSymbolic Decoding and Frozen LLMs
 
-This repository contains the code for the EMG silent-speech recognition pipeline described in **“Reducing Language-Prior Drift in EMG Silent Speech Recognition via NeuroSymbolic Constrained Decoding with Large Language Models.”** The system maps frame-level facial EMG features to a frozen decoder-only LLM through a compact trainable EMG adapter, trains with **dual AR+CTC supervision**, and applies **NeuroSymbolic constrained decoding** at inference using a lexicon trie, character 5-gram fusion, boundary control, EOS gating, and optional CTC-assisted reranking/adaptive fusion. In the paper, the full system on the Silent Speech EMG closed-vocabulary silent benchmark improves WER from **0.273** under AR beam decoding to **0.189**, with **0.073 CER** and **72% exact-match** using the Meta Llama 3.2 3B backbone. The same inference recipe is also evaluated with **Meta Llama 3.2 1B**, **Qwen2.5-3B-Instruct**, and **Mistral-7B-Instruct v0.3**.  
-
-This README is organized to make the repository easy to run end to end: environment setup, data split, training, lexicon generation, inference, and result organization.
+This repository contains the code for the EMG silent-speech recognition pipeline described in **“Reducing Language-Prior Drift in EMG Silent Speech Recognition via NeuroSymbolic Constrained Decoding with Large Language Models.”** The system maps frame-level facial EMG features to a frozen decoder-only LLM through a compact trainable EMG adapter, trains with **dual AR+CTC supervision**, and applies **NeuroSymbolic constrained decoding** at inference using a lexicon trie, character 5-gram fusion, boundary control, EOS gating, and optional CTC-assisted reranking/adaptive fusion.
 
 ---
 
-## 1. What this project does
+## 1. Project Repos
 
 The repository implements the following pipeline:
 
@@ -20,7 +18,7 @@ The repository implements the following pipeline:
    - character 5-gram LM
    - optional CTC-assisted reranking and adaptive AR/CTC fusion
 
-The dataset setup used in the paper is the **Silent Speech EMG closed-vocabulary silent split** with **500 utterances**, partitioned into **400 train / 50 validation / 50 test**. The benchmark uses **8-channel facial EMG** sampled at **1 kHz**. The fixed preprocessing recipe uses a **27 ms window** and **10 ms hop**, and features are z-normalized using statistics fit on the training split only.
+We used publicly available **SilentSpeech EMG** dataset with **500 utterances**, partitioned into **400 train / 50 validation / 50 test**. The benchmark uses **8-channel facial EMG** sampled at **1 kHz**.
 
 ---
 
@@ -30,13 +28,13 @@ The dataset setup used in the paper is the **Silent Speech EMG closed-vocabulary
 Silent_Speech_EMG/
 ├── artifacts/                # generated training/inference artifacts
 ├── data/                     # train/val/test EMG features + metadata
-├── Figures/                  # paper figures (not needed to run code)
+├── Figures/                  # Figures
 ├── models/                   # local model folders and adapter module
-├── Papers/                   # manuscript/pdf material (not needed to run code)
-├── Results/                  # saved tables/plots/json outputs for experiments
+├── Papers/                   # manuscript/pdf material
+├── Results/                  # saved json outputs for experiments
 ├── scripts/                  # helper scripts (dataset, lexicon, utilities)
 ├── inference_emg_llm.py      # inference + evaluation
-├── split_data.py             # dataset split/cleanup helper
+├── split_data.py             # dataset split
 ├── train_emg_llm.py          # training script
 ├── README.md
 └── requirements              # Python dependencies
@@ -46,7 +44,7 @@ Silent_Speech_EMG/
 
 ## 3. Environment setup
 
-Go to the project root and activate your environment.
+Go to the project root and activate environment.
 
 ```bash
 cd Silent_Speech_EMG
@@ -56,12 +54,6 @@ conda activate ss2
 Install dependencies:
 
 ```bash
-pip install -r requirements
-```
-
-If your dependency file is named `requirements.txt` locally, use:
-
-```bash
 pip install -r requirements.txt
 ```
 
@@ -69,21 +61,13 @@ pip install -r requirements.txt
 
 ## 4. Optional cleanup of previous artifacts
 
-If you want a fresh run, remove old generated files first.
+For a fresh run, remove old generated files first.
 
 ### Linux / macOS
 ```bash
 rm -rf artifacts
 mkdir -p artifacts
 ```
-
-### Windows PowerShell
-```powershell
-if (Test-Path artifacts) { Remove-Item -Recurse -Force artifacts }
-New-Item -ItemType Directory -Path artifacts | Out-Null
-```
-
-This is optional, but recommended before a new training run.
 
 ---
 
@@ -107,7 +91,7 @@ data/test_emg/*.npy + *.json
 
 ## 6. Training
 
-The default training recipe follows the paper’s neural setup:
+The default training recipe:
 
 - frozen decoder-only LLM backbone
 - trainable EMG adapter
@@ -129,12 +113,12 @@ python train_emg_llm.py \
   --artifacts_dir artifacts
 ```
 
-### Train with the primary paper backbone
+### Train with the primary backbone
 ```bash
 python train_emg_llm.py --base_model meta-llama/Llama-3.2-3B
 ```
 
-### Train with the other backbones used in the paper
+### Train with the other backbones
 ```bash
 python train_emg_llm.py --base_model meta-llama/Llama-3.2-1B
 python train_emg_llm.py --base_model Qwen/Qwen2.5-3B-Instruct
@@ -156,22 +140,8 @@ artifacts/train_config.json
 
 The NS decoder uses resources derived from the training transcripts.
 
-### Option A
 ```bash
 python scripts/make_lexicon.py --src data/train_emg --out artifacts/lexicon.txt
-```
-
-### Option B
-If your helper script uses `--train_dir` / `--out_dir`, use:
-
-```bash
-python scripts/make_lexicon.py --train_dir data/train_emg --out_dir artifacts
-```
-
-Expected output:
-
-```text
-artifacts/lexicon.txt
 ```
 
 If the script also writes training texts for the character LM, keep those in `artifacts/` as well.
@@ -179,17 +149,11 @@ If the script also writes training texts for the character LM, keep those in `ar
 ---
 
 ## 8. Optional cache cleanup for NS resources
-
-If you want to rebuild trie / LM caches from scratch:
+To rebuild trie / LM caches from scratch:
 
 ### Linux / macOS
 ```bash
 rm -f artifacts/trie.pkl artifacts/char_5gram.pkl artifacts/lexicon_words.pkl
-```
-
-### Windows PowerShell
-```powershell
-Remove-Item -Force artifacts/trie.pkl, artifacts/char_5gram.pkl, artifacts/lexicon_words.pkl -ErrorAction SilentlyContinue
 ```
 
 ---
@@ -204,11 +168,16 @@ The inference script always computes:
 
 If `--ns` is enabled, it also runs NeuroSymbolic decoding. If `--rerank --joint --adaptive` are enabled, it performs CTC-assisted reranking / adaptive fusion over the candidate set implemented by the current script.
 
-> **Important note:** the paper reports some inference-time hyperparameters such as explicit `δ`, `κ`, `γ`, EOS gating `m`, and rerank-list tuning. The current uploaded `inference_emg_llm.py` exposes the following CLI flags directly: `--max_len`, `--min_len`, `--beam`, `--alpha`, `--ns`, `--beta`, `--lexicon`, `--train_texts`, `--rerank`, `--joint`, `--lambda_ctc`, and `--adaptive`. The commands below therefore document the **current repository script interface**.
 
 ### A. Validation inference: neural-only AR beam
 
-This is the simplest validation-time decoding run.
+Default run:
+
+```bash
+python inference_emg_llm.py
+```
+
+or simplest validation-time decoding run with args:
 
 ```bash
 python inference_emg_llm.py \
@@ -216,15 +185,7 @@ python inference_emg_llm.py \
   --data_dir data/val_emg \
   --normalizer artifacts/emg_norm.pkl \
   --out artifacts/infer_val_ar_beam.jsonl \
-  --beam 6 \
-  --alpha 0.6 \
-  --max_len 128
-```
-
-You can also run with defaults:
-
-```bash
-python inference_emg_llm.py
+  --beam 6 --lmax 128 --alpha 0.6 --delta 5.0
 ```
 
 ### B. Validation inference: NS constrained beam
@@ -243,14 +204,9 @@ python inference_emg_llm.py \
   --data_dir data/val_emg \
   --normalizer artifacts/emg_norm.pkl \
   --out artifacts/infer_val_ns.jsonl \
-  --ns \
-  --lexicon artifacts/lexicon.txt \
-  --train_texts artifacts/train_texts.txt \
-  --beam 6 \
-  --alpha 0.6 \
-  --beta 0.55 \
-  --max_len 64 \
-  --min_len 8
+  --ns --lexicon artifacts/lexicon.txt \
+  --trie --beta 0.55 --kappa 0.40 --gamma 0.45 \
+  --beam 6 --lmax 64 --alpha 0.60 --delta 5.0 --min_eos_len 8
 ```
 
 ### C. Validation inference: NS + joint reranking + adaptive fusion
@@ -261,18 +217,12 @@ python inference_emg_llm.py \
   --data_dir data/val_emg \
   --normalizer artifacts/emg_norm.pkl \
   --out artifacts/infer_val_ns_rerank_adaptive.jsonl \
-  --ns \
-  --lexicon artifacts/lexicon.txt \
-  --train_texts artifacts/train_texts.txt \
-  --beam 6 \
-  --alpha 0.6 \
-  --beta 0.55 \
-  --max_len 64 \
-  --min_len 8 \
-  --rerank \
-  --joint \
-  --adaptive \
-  --lambda_ctc 0.25
+  --ns --lexicon artifacts/lexicon.txt \
+  --trie --beta 0.55 --kappa 0.40 --gamma 0.45 \
+  --beam 6 --lmax 64 --alpha 0.60 --delta 5.0 --min_eos_len 8 \
+  --rerank --joint --adaptive \
+  --rerank_M 16 --lambda_fix 0.25 \
+  --lambda_min 0.0 --lambda_max 0.6 --lambda0 0.25 --a 0.20 --b 0.20
 ```
 
 ### Output files written by inference
@@ -295,106 +245,36 @@ This repository is intended to support both training and inference-based reprodu
 
 ### Validation / checkpoint-selection settings used in training
 
-The training script selects `best_checkpoint.pt` using **neural-only AR beam** validation decoding, consistent with the paper’s checkpoint-selection strategy.
+The training script selects `best_checkpoint.pt` using **neural-only AR beam** validation decoding.
 
-### Paper-reported primary settings
+### Primary settings
 
-For the best-performing Meta Llama 3.2 3B system, the paper reports:
+For the best-performing Meta Llama 3.2-3B system:
 
 - validation checkpoint selection under AR beam: `K = 6`, `Lmax = 128`, `alpha = 0.6`, `delta = 5.0`
 - test-time NS decoding: trie on, `beta = 0.55`, `kappa = 0.40`, `gamma = 0.45`, `alpha = 0.60`, `delta = 5.0`, `m = 8`, `K = 6`, `Lmax = 64`
 - CTC-assisted inference tuned on validation and then frozen for test evaluation
 
-If you are reproducing the paper exactly, keep those settings in mind when aligning the final decoding configuration.
-
 ---
 
-## 11. Results summary
+## 11. Results folder
 
-Below is a concise summary of the main results reported in the paper.
+The `Results/` folder contains the saved experiment outputs. Please visit this folder directly to see the result files and JSON outputs.
 
-### 11.1 Primary backbone: Meta Llama 3.2 3B, one fixed checkpoint
+Current result groups include folders such as:
 
-| Decoding condition | WER | CER | Exact-match (%) |
-|---|---:|---:|---:|
-| CTC greedy | 0.326 | 0.109 | 44 |
-| AR greedy (K = 1) | 0.288 | 0.105 | 50 |
-| AR beam (K = 6) | 0.273 | 0.099 | 54 |
-| NS constrained beam | 0.220 | 0.082 | 66 |
-| NS + CTC candidate selection | 0.205 | 0.076 | 68 |
-| NS + joint AR+CTC reranking | 0.197 | 0.074 | 70 |
-| NS + joint reranking + adaptive fusion | 0.189 | 0.073 | 72 |
+- `Ablation_NS_Decoding/`
+- `LLM_Backbone_Results/`
+- `Silent Speech Test_Decoders/`
+- `WER decomposition/`
 
-### 11.2 Backbone comparison under the same inference recipe
+Example files inside these folders include JSON result files such as:
 
-| Backbone | WER | CER | Exact-match (%) |
-|---|---:|---:|---:|
-| Meta Llama 3.2 1B | 0.205 | 0.074 | 56 |
-| Meta Llama 3.2 3B | 0.189 | 0.073 | 72 |
-| Qwen2.5-3B-Instruct | 0.182 | 0.069 | 58 |
-| Mistral-7B-Instruct v0.3 | 0.174 | 0.067 | 60 |
+- `ablation_ns_full.json`
+- `ablation_wo_trie.json`
+- `llama32_3b.json`
+- `qwen25_3b_instruct.json`
+- `mistral7b_v03.json`
 
-### 11.3 Training-supervision ablation
+These files store decoded outputs and experiment summaries for backbone comparison, NeuroSymbolic decoding ablations, decoder evaluation, and WER-related analysis.
 
-| Training supervision | WER | CER |
-|---|---:|---:|
-| CTC-only (no AR head) | 0.338 | 0.113 |
-| AR-only (`lambda_ctc = 0`) | 0.206 | 0.077 |
-| AR+CTC (default) | 0.189 | 0.073 |
-
-### 11.4 NeuroSymbolic decoding ablation
-
-| Decoder variant | WER | CER | Exact-match (%) |
-|---|---:|---:|---:|
-| NS constrained beam (full) | 0.220 | 0.082 | 66 |
-| w/o trie constraint | 0.250 | 0.078 | 46 |
-| w/o 5-gram fusion (`beta = 0`) | 0.227 | 0.113 | 50 |
-| w/o boundary terms (`kappa = gamma = 0`) | 0.235 | 0.074 | 52 |
-| w/o EOS gating | 0.227 | 0.118 | 52 |
-
-### 11.5 Latency note
-
-The abstract reports a modest decoding-latency increase from **38 ms** to **49 ms** per utterance when moving from AR beam to the full system.
-
----
-
-## 12. Results folder
-
-I could not inspect the actual local `Results/` folder contents from this environment, so the list below documents the result groups that should be stored there for a clean release of the project.
-
-Recommended organization:
-
-```text
-Results/
-├── decoding_pipeline/            # Table II style summaries
-├── backbone_comparison/          # Fig. 2 style summaries/plots
-├── training_ablation/            # Table III style summaries
-├── ns_ablation/                  # Table IV + bootstrap summaries
-├── latency_memory/               # decoding cost / memory summaries
-└── json_outputs/                 # copied or linked inference .jsonl files
-```
-
-Good files to keep in `Results/` include:
-
-- summary tables in `.csv` or `.xlsx`
-- plots corresponding to backbone comparison and NS ablation
-- decoded JSONL outputs copied from `artifacts/`
-- any WER/CER/exact-match summaries used in the paper
-
----
-
-## 13. Notes
-
-- `Figures/` and `Papers/` are not needed to run the code and can be excluded from Git if desired.
-- Large local model folders under `models/` should also not be committed to GitHub.
-- The repository is most reproducible when you provide:
-  - exact model ID or local model path
-  - fixed environment versions
-  - the exact inference command used for each result table
-  - saved checkpoints when redistribution is allowed
-
----
-
-## 14. Citation
-
-If you use this repository, please cite the associated paper.
