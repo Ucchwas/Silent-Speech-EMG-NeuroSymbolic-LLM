@@ -1,0 +1,23 @@
+# Papers
+Papers/
+
+# Data
+data/
+
+Figures/
+
+# Model weight folders only
+models/llama3.2-1B/
+models/llama3.2-3B/
+models/mistral-7B-v0.3/
+models/qwen2.5-3B/
+
+# Artifacts
+artifacts/
+
+# Python / editor
+.venv/
+__pycache__/
+*.pyc
+.vscode/
+.DS_Store
