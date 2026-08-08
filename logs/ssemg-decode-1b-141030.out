@@ -1,0 +1,240 @@
+host=rpg-93-4  job=141030  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+primary decoding config: artifacts/ns_tuning_llama32_1b.json
+[make_lexicon] wrote: artifacts/lexicon.txt  (910 words)
+[make_lexicon] wrote: artifacts/lexicon.meta.json
+=== smoke test: 2 utterances, every decoder ===
+  ctc_greedy         ok
+  ctc_grammar        ok
+  ar_beam            ok
+  ns                 ok
+  ns_joint_adaptive  ok
+
+=== running 7 suites, 1 at a time ===
+  [decoders] -> GPU 0
+  [ablation] -> GPU 0
+  [decomp] -> GPU 0
+  [sweep_lam] -> GPU 0
+  [backbones] -> GPU 0
+  [sweep_beta] -> GPU 0
+  [supervision] -> GPU 0
+----- logs/suite_ablation.log -----
+
+Wrote: Results_reproduced/ablation/wo_eos.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_backbones.log -----
+
+Wrote: Results_reproduced/backbones/mistral7b_v03.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_decoders.log -----
+
+Wrote: Results_reproduced/decoders/ns_joint_adaptive.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_decomp.log -----
+
+Wrote: Results_reproduced/decomp/ns_joint_adaptive.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_supervision.log -----
+
+Wrote: Results_reproduced/supervision/ctc_only.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_sweep_beta.log -----
+
+Wrote: Results_reproduced/sweep_beta/mistral7b_v03__beta_0.8.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_sweep_lam.log -----
+
+Wrote: Results_reproduced/sweep_lam/lambda_0.6.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+=== latency (exclusive, GPU 0) ===
+[run_experiments] using tuned NS config from ns_tuning.json: {'beam': 48, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 2.0, 'lambda0': 1.9, 'a': 0.0, 'b': 0.0}
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ar_beam.jsonl --decoder ar_beam --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 0.6 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+
+Decoder: ar_beam   (50 utterances from data/test_emg)
+  WER 0.3333 | CER 0.1336 | Exact-match 34%
+  Sub 0.333 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1823.7 ms/utt | 7 chars/s | peak GPU mem 3.09 GB
+
+Wrote: Results_reproduced/latency/ar_beam.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ns.jsonl --decoder ns --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 0.6 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns   (50 utterances from data/test_emg)
+  WER 0.3333 | CER 0.1336 | Exact-match 34%
+  Sub 0.333 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns                   WER 0.3333  CER 0.1336  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 2114.1 ms/utt | 6 chars/s | peak GPU mem 3.09 GB
+
+Wrote: Results_reproduced/latency/ns.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ns_ctc_select.jsonl --decoder ns_ctc_select --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 0.6 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_ctc_select   (50 utterances from data/test_emg)
+  WER 0.3333 | CER 0.1336 | Exact-match 34%
+  Sub 0.333 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_ctc_select        WER 0.3333  CER 0.1336  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 2154.5 ms/utt | 6 chars/s | peak GPU mem 3.09 GB
+
+Wrote: Results_reproduced/latency/ns_ctc_select.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ns_joint_adaptive.jsonl --decoder ns_joint_adaptive --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 0.6 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_adaptive   (50 utterances from data/test_emg)
+  WER 0.3030 | CER 0.1240 | Exact-match 36%
+  Sub 0.303 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_adaptive    WER 0.3030  CER 0.1240  EM  36%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 2297.6 ms/utt | 5 chars/s | peak GPU mem 3.09 GB
+
+Wrote: Results_reproduced/latency/ns_joint_adaptive.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+
+################ TABLE II - decoding conditions ################
+system             n   WER     CER     EM%  WER_lo  WER_hi
+----------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   0.2560  0.4122
+ar_greedy          50  0.3561  0.1431  32   0.2774  0.4361
+ctc_greedy         50  0.2955  0.1088  34   0.2256  0.3692
+ns                 50  0.3333  0.1336  34   0.2560  0.4122
+ns_ctc_select      50  0.3333  0.1336  34   0.2560  0.4122
+ns_joint_adaptive  50  0.3030  0.1240  36   0.2308  0.3778
+ns_joint_rerank    50  0.2879  0.1145  38   0.2158  0.3643
+
+Wrote Results_reproduced/table2_decoders.csv
+
+################ TABLE III - training supervision ################
+system    n   WER     CER     EM%
+---------------------------------
+ar_ctc    50  0.3030  0.1240  36 
+ar_only   50  0.5000  0.2958  14 
+ctc_only  50  0.3712  0.1660  26 
+
+Wrote Results_reproduced/table3_supervision.csv
+
+################ TABLE IV / FIG 3 - NS ablations ################
+system       n   WER     CER     EM%  WER_lo  WER_hi
+----------------------------------------------------
+ns_full      50  0.3333  0.1336  34   0.2560  0.4122
+wo_5gram     50  0.3333  0.1336  34   0.2560  0.4122
+wo_boundary  50  0.3333  0.1336  34   0.2560  0.4122
+wo_eos       50  0.3333  0.1336  34   0.2560  0.4122
+wo_trie      50  0.3333  0.1336  34   0.2560  0.4122
+
+Wrote Results_reproduced/table4_ablation.csv
+
+################ TABLE V - error decomposition ################
+system             n   WER     CER     EM%  cSub   cDel   cIns   Sub    Del    Ins    weekday  month  day  year  clock  meridiem  num%  alpha%  shape%
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   0.128  0.000  0.006  0.333  0.000  0.000  100      97     56   11    33     100       38    98      100   
+ns                 50  0.3333  0.1336  34   0.128  0.000  0.006  0.333  0.000  0.000  100      97     56   11    33     100       38    98      100   
+ns_joint_adaptive  50  0.3030  0.1240  36   0.120  0.000  0.004  0.303  0.000  0.000  100      97     66   11    39     100       43    98      100   
+
+Wrote Results_reproduced/table5_decomp.csv
+
+################ TABLE VI - latency and peak memory ################
+system             n   WER     CER     EM%
+------------------------------------------
+ar_beam            50  0.3333  0.1336  34 
+ns                 50  0.3333  0.1336  34 
+ns_ctc_select      50  0.3333  0.1336  34 
+ns_joint_adaptive  50  0.3030  0.1240  36 
+
+Wrote Results_reproduced/table6_latency.csv
+
+################ FIG 2 - backbone comparison ################
+system              n   WER     CER     EM%  WER_lo  WER_hi
+-----------------------------------------------------------
+llama32_1b          50  0.3030  0.1240  36   0.2308  0.3778
+llama32_3b          50  0.4015  0.1775  22   0.3282  0.4741
+mistral7b_v03       50  0.3939  0.1508  22   0.3228  0.4651
+qwen25_3b_instruct  50  0.4091  0.1832  20   0.3359  0.4818
+
+Wrote Results_reproduced/fig2_backbones.csv
+
+################ FIG 4 - beta sweep (validation) ################
+system                         n   WER     CER     EM%
+------------------------------------------------------
+llama32_1b__beta_0.2           50  0.2331  0.0889  46 
+llama32_1b__beta_0.4           50  0.2481  0.0941  44 
+llama32_1b__beta_0.55          50  0.2556  0.0976  42 
+llama32_1b__beta_0.7           50  0.2707  0.1045  38 
+llama32_1b__beta_0.8           50  0.2707  0.1045  38 
+llama32_1b__beta_0             50  0.2331  0.0889  46 
+llama32_3b__beta_0.2           50  0.3383  0.1551  26 
+llama32_3b__beta_0.4           50  0.3383  0.1568  26 
+llama32_3b__beta_0.55          50  0.3383  0.1585  26 
+llama32_3b__beta_0.7           50  0.3383  0.1585  26 
+llama32_3b__beta_0.8           50  0.3534  0.1620  24 
+llama32_3b__beta_0             50  0.3383  0.1446  26 
+mistral7b_v03__beta_0.2        50  0.3534  0.1481  22 
+mistral7b_v03__beta_0.4        50  0.3534  0.1498  22 
+mistral7b_v03__beta_0.55       50  0.3459  0.1516  24 
+mistral7b_v03__beta_0.7        50  0.3459  0.1516  24 
+mistral7b_v03__beta_0.8        50  0.3459  0.1516  24 
+mistral7b_v03__beta_0          50  0.3534  0.1481  22 
+qwen25_3b_instruct__beta_0.2   50  0.3684  0.1585  22 
+qwen25_3b_instruct__beta_0.4   50  0.3684  0.1585  22 
+qwen25_3b_instruct__beta_0.55  50  0.3684  0.1603  22 
+qwen25_3b_instruct__beta_0.7   50  0.3835  0.1672  20 
+qwen25_3b_instruct__beta_0.8   50  0.3835  0.1672  20 
+qwen25_3b_instruct__beta_0     50  0.3684  0.1568  22 
+
+Wrote Results_reproduced/fig4_beta.csv
+
+################ FIG 5 - lambda sweep (validation) ################
+system       n   WER     CER     EM%
+------------------------------------
+lambda_0.15  50  0.3083  0.1132  30 
+lambda_0.25  50  0.2932  0.1098  34 
+lambda_0.35  50  0.2632  0.0993  40 
+lambda_0.5   50  0.2481  0.0941  44 
+lambda_0.6   50  0.2331  0.0889  46 
+lambda_0     50  0.3308  0.1289  26 
+
+Wrote Results_reproduced/fig5_lambda.csv
+
+all results under Results_reproduced/

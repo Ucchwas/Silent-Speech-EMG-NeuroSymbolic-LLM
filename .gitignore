@@ -12,6 +12,8 @@ models/llama3.2-3B/
 models/mistral-7B-v0.3/
 models/qwen2.5-3B/
 
+TASLP_NS_Silent_Speech/
+
 # Artifacts
 artifacts/
 

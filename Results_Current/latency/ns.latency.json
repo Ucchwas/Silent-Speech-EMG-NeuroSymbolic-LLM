@@ -1,0 +1,7 @@
+{
+  "decoder": "ns",
+  "n_utt": 50,
+  "ms_per_utt": 1772.7,
+  "chars_per_s": 6.9,
+  "peak_gpu_gb": 3.09
+}

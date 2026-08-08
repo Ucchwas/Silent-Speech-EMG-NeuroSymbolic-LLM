@@ -1,0 +1,126 @@
+host=rpg-93-6  job=141360  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+== E1/E2: pool + lexicon cell (llama32_1b, val)
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar   (50 utterances from data/val_emg)
+  WER 0.2256 | CER 0.0819 | Exact-match 48%
+  Sub 0.226 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar          WER 0.2256  CER 0.0819  EM  48%
+    ctc_grammar_ar       WER 0.2331  CER 0.0871  EM  44%
+    ctc_lexicon          WER 0.7669  CER 0.5139  EM   0%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+    ar_beam              WER 0.3233  CER 0.1237  EM  28%
+
+Wrote: artifacts/probe_pool/val_1b.jsonl
+  ok
+  ok  lambda_ar=0.0
+  ok  lambda_ar=0.25
+  ok  lambda_ar=0.5
+  ok  lambda_ar=1.0
+  ok  lambda_ar=2.0
+  ok  lambda_ar=4.0
+  ok  lambda_ar=8.0
+== E3: sup_ctc_only_llama32_1b
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar   (50 utterances from data/test_emg)
+  WER 0.3106 | CER 0.1527 | Exact-match 34%
+  Sub 0.311 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar          WER 0.3106  CER 0.1527  EM  34%
+    ar_greedy            WER 10.1667  CER 3.2080  EM   0%
+    ar_beam              WER 10.6364  CER 3.1756  EM   0%
+    ctc_greedy           WER 0.3712  CER 0.1660  EM  26%
+
+Wrote: artifacts/probe_pool/sup_sup_ctc_only_llama32_1b.jsonl
+  ok  sup_ctc_only_llama32_1b
+== E3: llama32_1b
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar   (50 utterances from data/test_emg)
+  WER 0.2348 | CER 0.0897 | Exact-match 46%
+  Sub 0.235 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar          WER 0.2348  CER 0.0897  EM  46%
+    ar_greedy            WER 0.3485  CER 0.1393  EM  34%
+    ar_beam              WER 0.3409  CER 0.1355  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+Wrote: artifacts/probe_pool/sup_llama32_1b.jsonl
+  ok  llama32_1b
+
+================ E1: pool oracle (validation) ================
+== val_1b.jsonl  (n = 50)
+  pool size          mean 8.00  max 8
+  top-1              WER 0.2256  CER 0.0819  EM 48%
+  pool oracle        WER 0.0902  CER 0.0331  EM 80%
+  headroom           +0.1353 WER (60.0% relative)
+  utterances where the pool holds something better: 18/50  (median rank 2)
+  reference present anywhere in the pool: 40/50
+
+  decoder              WER  grammar-valid
+  ar_beam           0.3233       50/50   
+  ctc_greedy        0.3459       23/50   
+  ctc_lexicon       0.7669        0/50   
+  ctc_grammar       0.2256       50/50   
+  ctc_grammar_ar    0.2331       50/50   
+
+  ar_beam vs ctc_greedy: agree 7/50, strict wins 11 vs 8, oracle WER 0.2632
+  ar_beam vs ctc_lexicon: agree 0/50, strict wins 42 vs 0, oracle WER 0.3233
+  ar_beam vs ctc_grammar: agree 16/50, strict wins 4 vs 16, oracle WER 0.1955
+  ar_beam vs ctc_grammar_ar: agree 26/50, strict wins 1 vs 13, oracle WER 0.2256
+  ctc_greedy vs ctc_lexicon: agree 0/50, strict wins 42 vs 0, oracle WER 0.3459
+  ctc_greedy vs ctc_grammar: agree 23/50, strict wins 0 vs 16, oracle WER 0.2256
+  ctc_greedy vs ctc_grammar_ar: agree 15/50, strict wins 3 vs 18, oracle WER 0.2105
+  ctc_lexicon vs ctc_grammar: agree 0/50, strict wins 0 vs 46, oracle WER 0.2256
+  ctc_lexicon vs ctc_grammar_ar: agree 0/50, strict wins 0 vs 47, oracle WER 0.2331
+  ctc_grammar vs ctc_grammar_ar: agree 32/50, strict wins 5 vs 4, oracle WER 0.1955
+
+================ E1/E2: decoder comparison (validation) ================
+  utterances where the pool holds something better: 18/50  (median rank 2)
+  reference present anywhere in the pool: 40/50
+
+  decoder              WER  grammar-valid
+  ar_beam           0.3233       50/50   
+  ctc_greedy        0.3459       23/50   
+  ctc_lexicon       0.7669        0/50   
+  ctc_grammar       0.2256       50/50   
+  ctc_grammar_ar    0.2331       50/50   
+
+  ar_beam vs ctc_greedy: agree 7/50, strict wins 11 vs 8, oracle WER 0.2632
+  ar_beam vs ctc_lexicon: agree 0/50, strict wins 42 vs 0, oracle WER 0.3233
+  ar_beam vs ctc_grammar: agree 16/50, strict wins 4 vs 16, oracle WER 0.1955
+  ar_beam vs ctc_grammar_ar: agree 26/50, strict wins 1 vs 13, oracle WER 0.2256
+  ctc_greedy vs ctc_lexicon: agree 0/50, strict wins 42 vs 0, oracle WER 0.3459
+  ctc_greedy vs ctc_grammar: agree 23/50, strict wins 0 vs 16, oracle WER 0.2256
+  ctc_greedy vs ctc_grammar_ar: agree 15/50, strict wins 3 vs 18, oracle WER 0.2105
+  ctc_lexicon vs ctc_grammar: agree 0/50, strict wins 0 vs 46, oracle WER 0.2256
+  ctc_lexicon vs ctc_grammar_ar: agree 0/50, strict wins 0 vs 47, oracle WER 0.2331
+  ctc_grammar vs ctc_grammar_ar: agree 32/50, strict wins 5 vs 4, oracle WER 0.1955
+
+================ E1: lambda_ar sweep (validation) ================
+system      n   WER     CER     EM%
+-----------------------------------
+lamar_0.0   50  0.2256  0.0819  48 
+lamar_0.25  50  0.2105  0.0819  52 
+lamar_0.5   50  0.1955  0.0784  54 
+lamar_1.0   50  0.2331  0.0871  44 
+lamar_2.0   50  0.2481  0.0906  42 
+lamar_4.0   50  0.2707  0.0958  36 
+lamar_8.0   50  0.2782  0.1010  34 
+
+Wrote artifacts/probe_pool/lambda_ar.csv
+
+================ E3: supervision x ctc_grammar (test) ================
+system                       n   WER     CER     EM%
+----------------------------------------------------
+sup_llama32_1b               50  0.2348  0.0897  46 
+sup_sup_ctc_only_llama32_1b  50  0.3106  0.1527  34 
+
+Wrote artifacts/probe_pool/e3_supervision.csv

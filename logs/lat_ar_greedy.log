@@ -1,0 +1,16 @@
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+
+Decoder: ar_greedy   (50 utterances from data/test_emg)
+  WER 0.3561 | CER 0.1431 | Exact-match 32%
+  Sub 0.356 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1553.3 ms/utt | 8 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ar_greedy.latency.json
+
+Wrote: Results_reproduced/latency/ar_greedy.jsonl

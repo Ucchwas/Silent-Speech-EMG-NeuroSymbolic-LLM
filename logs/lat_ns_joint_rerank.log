@@ -1,0 +1,18 @@
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/test_emg)
+  WER 0.2879 | CER 0.1145 | Exact-match 38%
+  Sub 0.288 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2879  CER 0.1145  EM  38%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1878.2 ms/utt | 6 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ns_joint_rerank.latency.json
+
+Wrote: Results_reproduced/latency/ns_joint_rerank.jsonl

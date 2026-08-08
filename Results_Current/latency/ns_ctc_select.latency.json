@@ -1,0 +1,7 @@
+{
+  "decoder": "ns_ctc_select",
+  "n_utt": 50,
+  "ms_per_utt": 1796.5,
+  "chars_per_s": 6.8,
+  "peak_gpu_gb": 3.09
+}

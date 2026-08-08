@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
@@ -10,7 +11,12 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from scripts.data_utils import TextTransform, load_normalizer
+try:
+    from scripts.data_utils import TextTransform, load_normalizer
+    from scripts.augment import AugmentConfig, augment_features
+except ImportError:
+    from data_utils import TextTransform, load_normalizer
+    from augment import AugmentConfig, augment_features
 
 
 def _json_for_npy(npy_path: Path) -> Optional[Path]:
@@ -53,7 +59,13 @@ class Sample:
 
 
 class EMGDataset(Dataset):
-    def __init__(self, data_dir: str, normalizer_path: Optional[str] = None):
+    def __init__(
+        self,
+        data_dir: str,
+        normalizer_path: Optional[str] = None,
+        augment: Optional["AugmentConfig"] = None,
+        seed: int = 1234,
+    ):
         self.data_dir = Path(data_dir)
         if not self.data_dir.exists():
             raise FileNotFoundError(f"data_dir not found: {self.data_dir}")
@@ -63,6 +75,8 @@ class EMGDataset(Dataset):
             raise FileNotFoundError(f"No (npy,json) pairs found in {self.data_dir}")
 
         self.tt = TextTransform()
+        self.augment = augment
+        self._seed = int(seed)
 
         self.normalizer = None
         if normalizer_path is not None and Path(normalizer_path).exists():
@@ -79,6 +93,12 @@ class EMGDataset(Dataset):
 
         if self.normalizer is not None:
             feats = self.normalizer.transform(feats).astype(np.float32)
+
+        # Augment AFTER normalisation, so the noise/gain strengths are in
+        # z-scored units and mean the same thing for every channel.
+        if self.augment is not None and getattr(self.augment, "enabled", False):
+            rng = np.random.default_rng((self._seed * 1_000_003 + idx * 7919 + random.randrange(1 << 30)))
+            feats = augment_features(feats, self.augment, rng).astype(np.float32)
 
         raw_text = read_text_from_json(json_path)
         clean_text = self.tt.clean(raw_text)  # paper-faithful normalization
@@ -140,15 +160,27 @@ def make_loader(
     batch_size: int,
     shuffle: bool,
     num_workers: int = 0,
+    augment: Optional[AugmentConfig] = None,
+    seed: int = 1234,
+    distributed: bool = False,
 ):
-    ds = EMGDataset(str(data_dir), normalizer_path=normalizer_path)
+    ds = EMGDataset(str(data_dir), normalizer_path=normalizer_path, augment=augment, seed=seed)
     tt = ds.tt
     pad_idx = tt.PAD_IDX
+
+    # Under DDP the training set is split across ranks by a DistributedSampler,
+    # which owns the shuffling; DataLoader(shuffle=...) must then be False.
+    sampler = None
+    if distributed:
+        from torch.utils.data.distributed import DistributedSampler
+
+        sampler = DistributedSampler(ds, shuffle=shuffle, seed=seed, drop_last=False)
 
     loader = DataLoader(
         ds,
         batch_size=batch_size,
-        shuffle=shuffle,
+        shuffle=(shuffle and sampler is None),
+        sampler=sampler,
         num_workers=num_workers,
         pin_memory=torch.cuda.is_available(),
         collate_fn=lambda b: collate_fn(b, pad_idx=pad_idx, tt=tt),

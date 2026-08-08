@@ -76,7 +76,49 @@ def _iter_jsons(src_dirs: Iterable[Path]) -> Iterable[Path]:
                     yield js
 
 
-def build_lexicon(src_dirs: List[Path], min_count: int = 1) -> Tuple[List[str], Counter]:
+def expand_numeral_classes(words: Iterable[str]) -> List[str]:
+    """
+    Close the *numeral classes* observed in training, instead of memorising the
+    exact numeral strings that happened to occur.
+
+    The benchmark is template-generated ("<time> am|pm", "<month> <day> <year>",
+    "<weekday> <month> <day>"), so the task's closed vocabulary is weekdays,
+    months, am/pm and three numeral classes. Observing "0112" and "0115" in
+    training tells you the class is hh:mm; it does not make "0113" out of
+    vocabulary.
+
+    Emitted classes, inferred from what training actually contains:
+      * 2-digit -> every value in the observed range (days 01-31)
+      * 4-digit -> every clock time hhmm with hh in 01..12 and mm in 00..59,
+                   plus every year in the observed year range
+
+    Without this, a strictly observed-token lexicon leaves ~17% of held-out
+    words outside the trie, which caps trie-constrained exact-match far below
+    the values reported in the paper.
+    """
+    words = set(words)
+    out = {w for w in words if not w.isdigit()}
+
+    d2 = [w for w in words if w.isdigit() and len(w) == 2]
+    d4 = [w for w in words if w.isdigit() and len(w) == 4]
+
+    if d2:
+        lo, hi = min(int(w) for w in d2), max(int(w) for w in d2)
+        out |= {f"{i:02d}" for i in range(lo, hi + 1)}
+
+    if d4:
+        out |= {f"{h:02d}{m:02d}" for h in range(1, 13) for m in range(60)}
+        years = [int(w) for w in d4 if not (1 <= int(w[:2]) <= 12 and int(w[2:]) <= 59)]
+        if years:
+            out |= {str(y) for y in range(min(years), max(years) + 1)}
+
+    out |= words  # never drop an actually observed token
+    return sorted(out)
+
+
+def build_lexicon(
+    src_dirs: List[Path], min_count: int = 1, expand_numerals: bool = False
+) -> Tuple[List[str], Counter]:
     """
     Build a word lexicon using TextTransform.clean() (paper-faithful normalization).
     """
@@ -90,8 +132,9 @@ def build_lexicon(src_dirs: List[Path], min_count: int = 1) -> Tuple[List[str], 
             if w:
                 counts[w] += 1
 
-    vocab = [w for w, c in counts.items() if c >= int(min_count)]
-    vocab = sorted(set(vocab))  # deterministic
+    vocab = sorted({w for w, c in counts.items() if c >= int(min_count)})
+    if expand_numerals:
+        vocab = expand_numeral_classes(vocab)
     return vocab, counts
 
 
@@ -114,19 +157,30 @@ def main() -> None:
         default=1,
         help="Keep words that appear at least this many times across --src.",
     )
+    ap.add_argument(
+        "--expand_numerals",
+        action="store_true",
+        help="Close the numeral classes seen in training (days, clock times, years) "
+             "instead of keeping only the exact numeral strings observed. See "
+             "expand_numeral_classes() for what this emits and why it matters.",
+    )
     args = ap.parse_args()
 
     src_dirs = [Path(s) for s in args.src]
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    lexicon, counts = build_lexicon(src_dirs, min_count=args.min_count)
+    lexicon, counts = build_lexicon(
+        src_dirs, min_count=args.min_count, expand_numerals=args.expand_numerals
+    )
 
     out_path.write_text("\n".join(lexicon) + ("\n" if lexicon else ""), encoding="utf-8")
 
     meta = {
         "src_dirs": [str(p) for p in src_dirs],
         "min_count": int(args.min_count),
+        "expand_numerals": bool(args.expand_numerals),
+        "num_observed_words": len(counts),
         "num_unique_words": len(lexicon),
         "top_50_words": counts.most_common(50),
     }

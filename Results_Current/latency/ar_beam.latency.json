@@ -1,0 +1,7 @@
+{
+  "decoder": "ar_beam",
+  "n_utt": 50,
+  "ms_per_utt": 1557.6,
+  "chars_per_s": 7.8,
+  "peak_gpu_gb": 3.09
+}

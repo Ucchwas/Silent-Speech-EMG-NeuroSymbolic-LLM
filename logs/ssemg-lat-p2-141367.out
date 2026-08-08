@@ -1,0 +1,68 @@
+host=rpg-93-2  job=141367  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+== latency: ctc_greedy
+  ok  ctc_greedy
+== latency: ctc_lexicon
+  ok  ctc_lexicon
+== latency: ctc_grammar
+  ok  ctc_grammar
+== latency: ctc_grammar_ar
+  ok  ctc_grammar_ar
+== latency: ar_greedy
+  ok  ar_greedy
+== latency: ar_beam
+  ok  ar_beam
+== latency: ns
+  ok  ns
+== latency: ns_ctc_select
+  ok  ns_ctc_select
+== latency: ns_joint_rerank
+  ok  ns_joint_rerank
+== latency: ns_joint_adaptive
+  ok  ns_joint_adaptive
+
+================ Table VI (test, single protocol) ================
+system             n   WER     CER     EM%  ms/utt  chars/s  peakGB
+-------------------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   1557.6  8        3.09  
+ar_greedy          50  0.3561  0.1431  32   1553.3  8        3.09  
+ctc_grammar        50  0.2348  0.0897  46   1547.7  8        3.09  
+ctc_grammar_ar     50  0.2652  0.1050  38   1571.2  8        3.09  
+ctc_greedy         50  0.2955  0.1088  34   1548.2  8        3.09  
+ctc_lexicon        50  0.2348  0.0897  46   1550.9  8        3.09  
+ns                 50  0.3333  0.1336  34   1772.7  7        3.09  
+ns_ctc_select      50  0.3333  0.1336  34   1796.5  7        3.09  
+ns_joint_adaptive  50  0.2879  0.1145  38   1881.6  6        3.09  
+ns_joint_rerank    50  0.2879  0.1145  38   1878.2  6        3.09  
+
+Wrote Results_reproduced/table6_latency.csv
+
+================ Fig. 3a validity (test) ================
+== 10 files, 50 utterances
+  pool size          mean 8.00  max 8
+  top-1              WER 0.2348  CER 0.0897  EM 46%
+  pool oracle        WER 0.1136  CER 0.0573  EM 72%
+  headroom           +0.1212 WER (51.6% relative)
+  utterances where the pool holds something better: 16/50  (median rank 4)
+  reference present anywhere in the pool: 36/50
+
+  decoder              WER  grammar-valid
+  ar_beam           0.3333       50/50   
+  ctc_greedy        0.2955       30/50   
+  ctc_lexicon       0.2348       50/50   
+  ctc_grammar       0.2348       50/50   
+  ctc_grammar_ar    0.2652       50/50   
+
+  wrote Results_reproduced/fig3_validity.csv
+
+  ar_beam vs ctc_greedy: agree 12/50, strict wins 8 vs 13, oracle WER 0.2348
+  ar_beam vs ctc_lexicon: agree 19/50, strict wins 3 vs 16, oracle WER 0.2121
+  ar_beam vs ctc_grammar: agree 19/50, strict wins 3 vs 16, oracle WER 0.2121
+  ar_beam vs ctc_grammar_ar: agree 27/50, strict wins 2 vs 11, oracle WER 0.2500
+  ctc_greedy vs ctc_lexicon: agree 30/50, strict wins 0 vs 8, oracle WER 0.2348
+  ctc_greedy vs ctc_grammar: agree 30/50, strict wins 0 vs 8, oracle WER 0.2348
+  ctc_greedy vs ctc_grammar_ar: agree 22/50, strict wins 3 vs 7, oracle WER 0.2424
+  ctc_lexicon vs ctc_grammar: agree 50/50, strict wins 0 vs 0, oracle WER 0.2348
+  ctc_lexicon vs ctc_grammar_ar: agree 34/50, strict wins 5 vs 1, oracle WER 0.2273
+  ctc_grammar vs ctc_grammar_ar: agree 34/50, strict wins 5 vs 1, oracle WER 0.2273

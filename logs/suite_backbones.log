@@ -1,0 +1,84 @@
+[run_experiments] using tuned NS config from ns_tuning.json: {'beam': 48, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 2.0, 'lambda0': 1.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 2.0] to contain lambda0=1.9 lambda_fix=2.0
+[run_experiments] using tuned NS config from ns_tuning_llama32_1b.json: {'beam': 48, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 2.0, 'lambda0': 1.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 2.0] to contain lambda0=1.9 lambda_fix=2.0
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/backbones/llama32_1b.jsonl --decoder ns_joint_adaptive --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_adaptive   (50 utterances from data/test_emg)
+  WER 0.2879 | CER 0.1145 | Exact-match 38%
+  Sub 0.288 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_adaptive    WER 0.2879  CER 0.1145  EM  38%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+Wrote: Results_reproduced/backbones/llama32_1b.jsonl
+[run_experiments] using tuned NS config from ns_tuning_llama32_3b.json: {'beam': 12, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 1.0, 'lambda0': 0.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 1.0] to contain lambda0=0.9 lambda_fix=1.0
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_3b.pt --data_dir data/test_emg --out Results_reproduced/backbones/llama32_3b.jsonl --decoder ns_joint_adaptive --beam 12 --max_len 64 --rerank_M 48 --per_step_top 50 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 1.0 --lambda0 0.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 1.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 123.56it/s]
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_adaptive   (50 utterances from data/test_emg)
+  WER 0.3939 | CER 0.1775 | Exact-match 24%
+  Sub 0.394 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_adaptive    WER 0.3939  CER 0.1775  EM  24%
+    ar_greedy            WER 0.4621  CER 0.2405  EM  18%
+    ar_beam              WER 0.4621  CER 0.2424  EM  18%
+    ctc_greedy           WER 0.4545  CER 0.1851  EM  16%
+
+Wrote: Results_reproduced/backbones/llama32_3b.jsonl
+[run_experiments] using tuned NS config from ns_tuning_qwen25_3b_instruct.json: {'beam': 48, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 4.0, 'lambda0': 3.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 4.0] to contain lambda0=3.9 lambda_fix=4.0
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_qwen25_3b_instruct.pt --data_dir data/test_emg --out Results_reproduced/backbones/qwen25_3b_instruct.jsonl --decoder ns_joint_adaptive --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 4.0 --lambda0 3.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 4.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 73.62it/s]
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_adaptive   (50 utterances from data/test_emg)
+  WER 0.4015 | CER 0.1775 | Exact-match 22%
+  Sub 0.402 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_adaptive    WER 0.4015  CER 0.1775  EM  22%
+    ar_greedy            WER 0.4394  CER 0.2214  EM  14%
+    ar_beam              WER 0.4470  CER 0.2233  EM  12%
+    ctc_greedy           WER 0.4621  CER 0.1775  EM  14%
+
+Wrote: Results_reproduced/backbones/qwen25_3b_instruct.jsonl
+[run_experiments] using tuned NS config from ns_tuning_mistral7b_v03.json: {'beam': 12, 'min_eos_len': 2, 'beta': 0.3, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 2.0, 'lambda0': 1.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 2.0] to contain lambda0=1.9 lambda_fix=2.0
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_mistral7b_v03.pt --data_dir data/test_emg --out Results_reproduced/backbones/mistral7b_v03.jsonl --decoder ns_joint_adaptive --beam 12 --max_len 64 --rerank_M 48 --per_step_top 50 --alpha 0.0 --delta 5.0 --beta 0.3 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 154.63it/s]
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_adaptive   (50 utterances from data/test_emg)
+  WER 0.3788 | CER 0.1431 | Exact-match 26%
+  Sub 0.379 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_adaptive    WER 0.3788  CER 0.1431  EM  26%
+    ar_greedy            WER 0.4167  CER 0.1832  EM  18%
+    ar_beam              WER 0.4167  CER 0.1908  EM  18%
+    ctc_greedy           WER 0.3636  CER 0.1317  EM  26%
+
+Wrote: Results_reproduced/backbones/mistral7b_v03.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl

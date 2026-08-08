@@ -1,0 +1,7 @@
+{
+  "decoder": "ctc_greedy",
+  "n_utt": 50,
+  "ms_per_utt": 1548.2,
+  "chars_per_s": 7.7,
+  "peak_gpu_gb": 3.09
+}

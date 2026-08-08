@@ -8,13 +8,6 @@ import numpy as np
 from unidecode import unidecode
 
 
-def sliding_window(x: np.ndarray, win: int = 14, hop: int = 7) -> np.ndarray:
-    segs = []
-    for i in range(0, len(x) - win + 1, hop):
-        segs.append(x[i : i + win])
-    return np.stack(segs, axis=0)  # (N, win, C)
-
-
 @dataclass
 class NormState:
     mean: np.ndarray
@@ -60,12 +53,21 @@ def save_normalizer(normalizer: FeatureNormalizer, path: str) -> None:
 
 class TextTransform:
     """
-    Transcript normalization (paper-faithful):
+    Transcript normalization (paper-faithful, Sec. III-C):
       - unidecode
       - lowercase
-      - keep only [a-z0-9] and spaces (everything else becomes a space)
+      - DELETE every character that is not [a-z0-9] or whitespace
       - collapse multiple spaces into one
       - strip
+
+    Punctuation is *deleted*, not turned into a space. This matters: the
+    closed-vocabulary benchmark writes times as "10:45 AM", which must
+    normalize to the single token "1045 am" (as in the released reference
+    transcripts), not to "10 45 am". Replacing punctuation with a space
+    would split every time expression into two words, inflating both the
+    lexicon and WER.
+
+    Digits are kept as digits (the task is templated date/time prompts).
 
     Tokenization is character-level over:
       BASE_CHARS = [a-z][0-9] and space
@@ -79,7 +81,8 @@ class TextTransform:
     PAD_IDX = len(BASE_CHARS) + 2
     VOCAB_SIZE = len(BASE_CHARS) + 3
 
-    _re_non_alnum_space = re.compile(r"[^a-z0-9]+")
+    # Drop anything that is neither an allowed character nor whitespace.
+    _re_drop = re.compile(r"[^a-z0-9\s]+")
     _re_spaces = re.compile(r"\s+")
 
     def __init__(self):
@@ -89,9 +92,9 @@ class TextTransform:
         if s is None:
             return ""
         s = unidecode(str(s)).lower()
-        # Convert any run of non [a-z0-9] into a single space
-        s = self._re_non_alnum_space.sub(" ", s)
-        # Collapse spaces
+        # Delete disallowed characters (keep whitespace so word breaks survive)
+        s = self._re_drop.sub("", s)
+        # Collapse whitespace runs
         s = self._re_spaces.sub(" ", s).strip()
         return s
 

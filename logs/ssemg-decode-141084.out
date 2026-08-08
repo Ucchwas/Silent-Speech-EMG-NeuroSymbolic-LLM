@@ -1,0 +1,288 @@
+host=rpg-93-6  job=141084  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+archiving previous results -> Results_reproduced.superseded.20260806-192343
+primary decoding config: artifacts/ns_tuning_llama32_1b.json
+[make_lexicon] wrote: artifacts/lexicon.txt  (910 words)
+[make_lexicon] wrote: artifacts/lexicon.meta.json
+=== smoke test: 2 utterances, every decoder ===
+  ctc_greedy         ok
+  ctc_grammar        ok
+  ar_beam            ok
+  ns                 ok
+  ns_joint_adaptive  ok
+
+=== running 7 suites, 1 at a time ===
+  [decoders] -> GPU 0
+  [ablation] -> GPU 0
+  [decomp] -> GPU 0
+  [sweep_lam] -> GPU 0
+  [backbones] -> GPU 0
+  [sweep_beta] -> GPU 0
+  [supervision] -> GPU 0
+----- logs/suite_ablation.log -----
+
+Wrote: Results_reproduced/ablation/wo_eos.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_backbones.log -----
+
+Wrote: Results_reproduced/backbones/mistral7b_v03.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_decoders.log -----
+
+Wrote: Results_reproduced/decoders/ns_joint_adaptive.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_decomp.log -----
+
+Wrote: Results_reproduced/decomp/ns_joint_adaptive.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_supervision.log -----
+
+Wrote: Results_reproduced/supervision/ctc_only.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_sweep_beta.log -----
+
+Wrote: Results_reproduced/sweep_beta/mistral7b_v03__beta_0.8.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+----- logs/suite_sweep_lam.log -----
+
+Wrote: Results_reproduced/sweep_lam/lambda_3.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+=== latency (exclusive, GPU 0) ===
+[run_experiments] using tuned NS config from ns_tuning.json: {'beam': 48, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 2.0, 'lambda0': 1.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 2.0] to contain lambda0=1.9 lambda_fix=2.0
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ctc_greedy.jsonl --decoder ctc_greedy --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+
+Decoder: ctc_greedy   (50 utterances from data/test_emg)
+  WER 0.2955 | CER 0.1088 | Exact-match 34%
+  Sub 0.295 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+
+  Latency 1547.7 ms/utt | 8 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ctc_greedy.latency.json
+
+Wrote: Results_reproduced/latency/ctc_greedy.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ctc_grammar.jsonl --decoder ctc_grammar --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar   (50 utterances from data/test_emg)
+  WER 0.2348 | CER 0.0897 | Exact-match 46%
+  Sub 0.235 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar          WER 0.2348  CER 0.0897  EM  46%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1556.2 ms/utt | 8 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ctc_grammar.latency.json
+
+Wrote: Results_reproduced/latency/ctc_grammar.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ar_beam.jsonl --decoder ar_beam --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+
+Decoder: ar_beam   (50 utterances from data/test_emg)
+  WER 0.3333 | CER 0.1336 | Exact-match 34%
+  Sub 0.333 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1555.4 ms/utt | 8 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ar_beam.latency.json
+
+Wrote: Results_reproduced/latency/ar_beam.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ns.jsonl --decoder ns --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns   (50 utterances from data/test_emg)
+  WER 0.3333 | CER 0.1336 | Exact-match 34%
+  Sub 0.333 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns                   WER 0.3333  CER 0.1336  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1789.0 ms/utt | 7 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ns.latency.json
+
+Wrote: Results_reproduced/latency/ns.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ns_ctc_select.jsonl --decoder ns_ctc_select --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_ctc_select   (50 utterances from data/test_emg)
+  WER 0.3333 | CER 0.1336 | Exact-match 34%
+  Sub 0.333 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_ctc_select        WER 0.3333  CER 0.1336  EM  34%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1794.7 ms/utt | 7 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ns_ctc_select.latency.json
+
+Wrote: Results_reproduced/latency/ns_ctc_select.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/test_emg --out Results_reproduced/latency/ns_joint_adaptive.jsonl --decoder ns_joint_adaptive --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --measure_latency
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_adaptive   (50 utterances from data/test_emg)
+  WER 0.2879 | CER 0.1145 | Exact-match 38%
+  Sub 0.288 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_adaptive    WER 0.2879  CER 0.1145  EM  38%
+    ar_greedy            WER 0.3561  CER 0.1431  EM  32%
+    ar_beam              WER 0.3333  CER 0.1336  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+  Latency 1917.1 ms/utt | 6 chars/s | peak GPU mem 3.09 GB
+  wrote Results_reproduced/latency/ns_joint_adaptive.latency.json
+
+Wrote: Results_reproduced/latency/ns_joint_adaptive.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl
+
+################ TABLE II - decoding conditions ################
+system             n   WER     CER     EM%  WER_lo  WER_hi
+----------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   0.2560  0.4122
+ar_greedy          50  0.3561  0.1431  32   0.2774  0.4361
+ctc_grammar        50  0.2348  0.0897  46   0.1679  0.3047
+ctc_greedy         50  0.2955  0.1088  34   0.2256  0.3692
+ns                 50  0.3333  0.1336  34   0.2560  0.4122
+ns_ctc_select      50  0.3333  0.1336  34   0.2560  0.4122
+ns_joint_adaptive  50  0.2879  0.1145  38   0.2158  0.3643
+ns_joint_rerank    50  0.2879  0.1145  38   0.2158  0.3643
+
+Wrote Results_reproduced/table2_decoders.csv
+
+################ TABLE III - training supervision ################
+system    n   WER     CER     EM%
+---------------------------------
+ar_ctc    50  0.2879  0.1145  38 
+ar_only   50  0.5833  0.4008  12 
+ctc_only  50  0.3712  0.1660  26 
+
+Wrote Results_reproduced/table3_supervision.csv
+
+################ TABLE IV / FIG 3 - NS ablations ################
+system       n   WER     CER     EM%  WER_lo  WER_hi
+----------------------------------------------------
+ns_full      50  0.3333  0.1336  34   0.2560  0.4122
+wo_5gram     50  0.3333  0.1336  34   0.2560  0.4122
+wo_boundary  50  0.3333  0.1336  34   0.2560  0.4122
+wo_eos       50  0.3333  0.1336  34   0.2560  0.4122
+wo_trie      50  0.3333  0.1336  34   0.2560  0.4122
+
+Wrote Results_reproduced/table4_ablation.csv
+
+################ TABLE V - error decomposition ################
+system             n   WER     CER     EM%  cSub   cDel   cIns   Sub    Del    Ins    weekday  month  day  year  clock  meridiem  num%  alpha%  shape%
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   0.128  0.000  0.006  0.333  0.000  0.000  100      97     56   11    33     100       38    98      100   
+ctc_grammar        50  0.2348  0.0897  46   0.086  0.000  0.004  0.235  0.000  0.000  100      97     81   42    28     100       57    98      100   
+ctc_greedy         50  0.2955  0.1088  34   0.067  0.031  0.011  0.295  0.000  0.000  77       94     75   37    22     100       51    92      100   
+ns                 50  0.3333  0.1336  34   0.128  0.000  0.006  0.333  0.000  0.000  100      97     56   11    33     100       38    98      100   
+ns_joint_adaptive  50  0.2879  0.1145  38   0.111  0.000  0.004  0.288  0.000  0.000  100      97     72   16    33     100       46    98      100   
+
+Wrote Results_reproduced/table5_decomp.csv
+
+################ TABLE VI - latency and peak memory ################
+system             n   WER     CER     EM%  ms/utt  chars/s  peakGB
+-------------------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   1555.4  8        3.09  
+ctc_grammar        50  0.2348  0.0897  46   1556.2  8        3.09  
+ctc_greedy         50  0.2955  0.1088  34   1547.7  8        3.09  
+ns                 50  0.3333  0.1336  34   1789.0  7        3.09  
+ns_ctc_select      50  0.3333  0.1336  34   1794.7  7        3.09  
+ns_joint_adaptive  50  0.2879  0.1145  38   1917.1  6        3.09  
+
+Wrote Results_reproduced/table6_latency.csv
+
+################ FIG 2 - backbone comparison ################
+system              n   WER     CER     EM%  WER_lo  WER_hi
+-----------------------------------------------------------
+llama32_1b          50  0.2879  0.1145  38   0.2158  0.3643
+llama32_3b          50  0.3939  0.1775  24   0.3185  0.4697
+mistral7b_v03       50  0.3788  0.1431  26   0.3047  0.4531
+qwen25_3b_instruct  50  0.4015  0.1775  22   0.3259  0.4773
+
+Wrote Results_reproduced/fig2_backbones.csv
+
+################ FIG 4 - beta sweep (validation) ################
+system                         n   WER     CER     EM%
+------------------------------------------------------
+llama32_1b__beta_0.2           50  0.2105  0.0836  52 
+llama32_1b__beta_0.4           50  0.2180  0.0854  52 
+llama32_1b__beta_0.55          50  0.2256  0.0854  50 
+llama32_1b__beta_0.7           50  0.2331  0.0871  48 
+llama32_1b__beta_0.8           50  0.2406  0.0906  46 
+llama32_1b__beta_0             50  0.2105  0.0836  52 
+llama32_3b__beta_0.2           50  0.3383  0.1411  26 
+llama32_3b__beta_0.4           50  0.3383  0.1411  26 
+llama32_3b__beta_0.55          50  0.3383  0.1446  26 
+llama32_3b__beta_0.7           50  0.3383  0.1446  26 
+llama32_3b__beta_0.8           50  0.3534  0.1481  24 
+llama32_3b__beta_0             50  0.3383  0.1411  26 
+mistral7b_v03__beta_0.2        50  0.3459  0.1411  24 
+mistral7b_v03__beta_0.4        50  0.3459  0.1411  24 
+mistral7b_v03__beta_0.55       50  0.3308  0.1394  28 
+mistral7b_v03__beta_0.7        50  0.3308  0.1376  28 
+mistral7b_v03__beta_0.8        50  0.3308  0.1376  28 
+mistral7b_v03__beta_0          50  0.3534  0.1446  22 
+qwen25_3b_instruct__beta_0.2   50  0.3383  0.1307  32 
+qwen25_3b_instruct__beta_0.4   50  0.3383  0.1307  32 
+qwen25_3b_instruct__beta_0.55  50  0.3383  0.1307  32 
+qwen25_3b_instruct__beta_0.7   50  0.3534  0.1411  30 
+qwen25_3b_instruct__beta_0.8   50  0.3534  0.1411  30 
+qwen25_3b_instruct__beta_0     50  0.3383  0.1324  32 
+
+Wrote Results_reproduced/fig4_beta.csv
+
+################ FIG 5 - lambda sweep (validation) ################
+system       n   WER     CER     EM%
+------------------------------------
+lambda_0.25  50  0.2932  0.1098  34 
+lambda_0.5   50  0.2481  0.0941  44 
+lambda_0.75  50  0.2331  0.0889  46 
+lambda_0     50  0.3308  0.1289  26 
+lambda_1.5   50  0.2256  0.0889  48 
+lambda_1     50  0.2331  0.0889  46 
+lambda_2.5   50  0.2105  0.0836  52 
+lambda_2     50  0.2105  0.0836  52 
+lambda_3     50  0.2180  0.0854  50 
+
+Wrote Results_reproduced/fig5_lambda.csv
+
+all results under Results_reproduced/

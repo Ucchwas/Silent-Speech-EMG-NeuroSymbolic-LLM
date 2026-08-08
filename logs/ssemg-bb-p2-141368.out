@@ -1,0 +1,17 @@
+host=rpg-93-1  job=141368  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+  ok llama32_1b
+  ok llama32_3b
+  ok qwen25_3b_instruct
+  ok mistral7b_v03
+
+============ Fig. 2 (test, ctc_grammar) ============
+system              n   WER     CER     EM%  WER_lo  WER_hi
+-----------------------------------------------------------
+llama32_1b          50  0.2348  0.0897  46   0.1679  0.3047
+llama32_3b          50  0.3485  0.1584  24   0.2812  0.4167
+mistral7b_v03       50  0.2955  0.1011  32   0.2313  0.3636
+qwen25_3b_instruct  50  0.3788  0.1546  24   0.3060  0.4545
+
+Wrote Results_reproduced/fig2_backbones.csv

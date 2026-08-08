@@ -1,0 +1,15 @@
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar   (50 utterances from data/test_emg)
+  WER 0.2348 | CER 0.0897 | Exact-match 46%
+  Sub 0.235 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar          WER 0.2348  CER 0.0897  EM  46%
+    ar_greedy            WER 0.3485  CER 0.1393  EM  34%
+    ar_beam              WER 0.3409  CER 0.1355  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+Wrote: Results_reproduced/backbones/llama32_1b.jsonl

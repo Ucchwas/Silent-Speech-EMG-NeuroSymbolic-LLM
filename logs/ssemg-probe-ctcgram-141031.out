@@ -1,0 +1,35 @@
+host=rpg-93-6  job=141031  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+  ok  llama32_1b
+  ok  llama32_3b
+  ok  qwen25_3b_instruct
+  ok  mistral7b_v03
+
+================ grammar-constrained CTC (validation) ================
+system              n   WER     CER     EM%
+-------------------------------------------
+llama32_1b          50  0.2256  0.0819  48 
+llama32_3b          50  0.3008  0.1254  32 
+mistral7b_v03       50  0.3308  0.1150  26 
+qwen25_3b_instruct  50  0.3308  0.1185  30 
+
+Wrote artifacts/probe_ctcgram/ctcgram.csv
+
+---- per-channel within each file ----
+== llama32_1b
+    ctc_greedy  llama32_1b  50  0.3459  0.1150  24 
+    ctc_grammar  llama32_1b  50  0.2256  0.0819  48 
+    ar_beam  llama32_1b  50  0.3233  0.1237  28 
+== llama32_3b
+    ctc_greedy  llama32_3b  50  0.3910  0.1568  24 
+    ctc_grammar  llama32_3b  50  0.3008  0.1254  32 
+    ar_beam  llama32_3b  50  0.3835  0.1777  16 
+== mistral7b_v03
+    ctc_greedy  mistral7b_v03  50  0.4135  0.1620  20 
+    ctc_grammar  mistral7b_v03  50  0.3308  0.1150  26 
+    ar_beam  mistral7b_v03  50  0.3910  0.1638  16 
+== qwen25_3b_instruct
+    ctc_greedy  qwen25_3b_instruct  50  0.4286  0.1551  18 
+    ctc_grammar  qwen25_3b_instruct  50  0.3308  0.1185  30 
+    ar_beam  qwen25_3b_instruct  50  0.4060  0.1882  14 

@@ -1,0 +1,137 @@
+host=rpg-93-3  job=141364  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+== test: ctc_grammar_ar
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar_ar   (50 utterances from data/test_emg)
+  WER 0.2652 | CER 0.1050 | Exact-match 38%
+  Sub 0.265 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar_ar       WER 0.2652  CER 0.1050  EM  38%
+    ar_greedy            WER 0.3485  CER 0.1393  EM  34%
+    ar_beam              WER 0.3409  CER 0.1355  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+Wrote: Results_reproduced/decoders/ctc_grammar_ar.jsonl
+  ok  ctc_grammar_ar
+== test: ctc_lexicon
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_lexicon   (50 utterances from data/test_emg)
+  WER 0.2348 | CER 0.0897 | Exact-match 46%
+  Sub 0.235 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_lexicon          WER 0.2348  CER 0.0897  EM  46%
+    ar_greedy            WER 0.3485  CER 0.1393  EM  34%
+    ar_beam              WER 0.3409  CER 0.1355  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+Wrote: Results_reproduced/decoders/ctc_lexicon.jsonl
+  ok  ctc_lexicon
+== test: ctc_grammar (with pool)
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ctc_grammar   (50 utterances from data/test_emg)
+  WER 0.2348 | CER 0.0897 | Exact-match 46%
+  Sub 0.235 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ctc_grammar          WER 0.2348  CER 0.0897  EM  46%
+    ar_greedy            WER 0.3485  CER 0.1393  EM  34%
+    ar_beam              WER 0.3409  CER 0.1355  EM  34%
+    ctc_greedy           WER 0.2955  CER 0.1088  EM  34%
+
+Wrote: Results_reproduced/decoders/ctc_grammar.jsonl
+  ok
+  ok  latency ctc_grammar_ar
+  ok  latency ctc_lexicon
+
+================ Table II (test) ================
+system             n   WER     CER     EM%  WER_lo  WER_hi
+----------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   0.2560  0.4122
+ar_greedy          50  0.3561  0.1431  32   0.2774  0.4361
+ctc_grammar        50  0.2348  0.0897  46   0.1679  0.3047
+ctc_grammar_ar     50  0.2652  0.1050  38   0.2016  0.3308
+ctc_greedy         50  0.2955  0.1088  34   0.2256  0.3692
+ctc_lexicon        50  0.2348  0.0897  46   0.1679  0.3047
+ns                 50  0.3333  0.1336  34   0.2560  0.4122
+ns_ctc_select      50  0.3333  0.1336  34   0.2560  0.4122
+ns_joint_adaptive  50  0.2879  0.1145  38   0.2158  0.3643
+ns_joint_rerank    50  0.2879  0.1145  38   0.2158  0.3643
+
+Wrote Results_reproduced/table2_decoders.csv
+
+================ Table V (test) ================
+system             n   WER     CER     EM%  cSub   cDel   cIns   weekday  month  day  year  clock  meridiem  num%  alpha%  shape%
+---------------------------------------------------------------------------------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   0.128  0.000  0.006  100      97     56   11    33     100       38    98      100   
+ctc_grammar        50  0.2348  0.0897  46   0.086  0.000  0.004  100      97     81   42    28     100       57    98      100   
+ctc_grammar_ar     50  0.2652  0.1050  38   0.101  0.000  0.004  100      97     72   32    33     100       51    98      100   
+ctc_greedy         50  0.2955  0.1088  34   0.067  0.031  0.011  77       94     75   37    22     100       51    92      100   
+ns                 50  0.3333  0.1336  34   0.128  0.000  0.006  100      97     56   11    33     100       38    98      100   
+ns_joint_adaptive  50  0.2879  0.1145  38   0.111  0.000  0.004  100      97     72   16    33     100       46    98      100   
+
+Wrote Results_reproduced/table5_decomp.csv
+
+================ Table VI (test) ================
+system             n   WER     CER     EM%  ms/utt  chars/s  peakGB
+-------------------------------------------------------------------
+ar_beam            50  0.3333  0.1336  34   1555.4  8        3.09  
+ctc_grammar        50  0.2348  0.0897  46   1556.2  8        3.09  
+ctc_grammar_ar     50  0.2652  0.1050  38   1301.2  9        2.68  
+ctc_greedy         50  0.2955  0.1088  34   1547.7  8        3.09  
+ctc_lexicon        50  0.2348  0.0897  46   1268.9  10       2.68  
+ns                 50  0.3333  0.1336  34   1789.0  7        3.09  
+ns_ctc_select      50  0.3333  0.1336  34   1794.7  7        3.09  
+ns_joint_adaptive  50  0.2879  0.1145  38   1917.1  6        3.09  
+
+Wrote Results_reproduced/table6_latency.csv
+
+================ channels + pool oracle (test) ================
+== 10 files, 50 utterances
+  pool size          mean 8.00  max 8
+  top-1              WER 0.2348  CER 0.0897  EM 46%
+  pool oracle        WER 0.1136  CER 0.0573  EM 72%
+  headroom           +0.1212 WER (51.6% relative)
+  utterances where the pool holds something better: 16/50  (median rank 4)
+  reference present anywhere in the pool: 36/50
+
+  decoder              WER  grammar-valid
+  ar_beam           0.3333       50/50   
+  ctc_greedy        0.2955       30/50   
+  ctc_lexicon       0.2348       50/50   
+  ctc_grammar       0.2348       50/50   
+  ctc_grammar_ar    0.2652       50/50   
+
+  ar_beam vs ctc_greedy: agree 12/50, strict wins 8 vs 13, oracle WER 0.2348
+  ar_beam vs ctc_lexicon: agree 19/50, strict wins 3 vs 16, oracle WER 0.2121
+  ar_beam vs ctc_grammar: agree 19/50, strict wins 3 vs 16, oracle WER 0.2121
+  ar_beam vs ctc_grammar_ar: agree 27/50, strict wins 2 vs 11, oracle WER 0.2500
+  ctc_greedy vs ctc_lexicon: agree 30/50, strict wins 0 vs 8, oracle WER 0.2348
+  ctc_greedy vs ctc_grammar: agree 30/50, strict wins 0 vs 8, oracle WER 0.2348
+  ctc_greedy vs ctc_grammar_ar: agree 22/50, strict wins 3 vs 7, oracle WER 0.2424
+  ctc_lexicon vs ctc_grammar: agree 50/50, strict wins 0 vs 0, oracle WER 0.2348
+  ctc_lexicon vs ctc_grammar_ar: agree 34/50, strict wins 5 vs 1, oracle WER 0.2273
+  ctc_grammar vs ctc_grammar_ar: agree 34/50, strict wins 5 vs 1, oracle WER 0.2273
+
+================ paired bootstrap vs ctc_grammar_ar ================
+Paired bootstrap (10000 resamples)
+  ctc_grammar_ar: WER 0.2652
+  ctc_grammar: WER 0.2348
+  delta = +0.0303, p = 0.1036
+Paired bootstrap (10000 resamples)
+  ctc_grammar_ar: WER 0.2652
+  ctc_greedy: WER 0.2955
+  delta = -0.0303, p = 0.2376
+Paired bootstrap (10000 resamples)
+  ctc_grammar_ar: WER 0.2652
+  ar_beam: WER 0.3333
+  delta = -0.0682, p = 0.0075
+Paired bootstrap (10000 resamples)
+  ctc_grammar_ar: WER 0.2652
+  ns_joint_rerank: WER 0.2879
+  delta = -0.0227, p = 0.2036

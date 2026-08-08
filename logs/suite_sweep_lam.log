@@ -1,0 +1,158 @@
+[run_experiments] using tuned NS config from ns_tuning.json: {'beam': 48, 'min_eos_len': 2, 'beta': 0.0, 'kappa': 0.0, 'gamma': 0.45, 'alpha': 0.0, 'delta': 5.0, 'ctc_select_lengthnorm': True, 'lambda_fix': 2.0, 'lambda0': 1.9, 'a': 0.0, 'b': 0.0}
+[run_experiments] widening lambda clip [0.0, 0.6] -> [0.0, 2.0] to contain lambda0=1.9 lambda_fix=2.0
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_0.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 0.0
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.3308 | CER 0.1289 | Exact-match 26%
+  Sub 0.331 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.3308  CER 0.1289  EM  26%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_0.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_0.25.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 0.25
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2932 | CER 0.1098 | Exact-match 34%
+  Sub 0.293 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2932  CER 0.1098  EM  34%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_0.25.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_0.5.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 0.5
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2481 | CER 0.0941 | Exact-match 44%
+  Sub 0.248 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2481  CER 0.0941  EM  44%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_0.5.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_0.75.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 0.75
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2331 | CER 0.0889 | Exact-match 46%
+  Sub 0.233 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2331  CER 0.0889  EM  46%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_0.75.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_1.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 1.0
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2331 | CER 0.0889 | Exact-match 46%
+  Sub 0.233 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2331  CER 0.0889  EM  46%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_1.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_1.5.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 1.5
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2256 | CER 0.0889 | Exact-match 48%
+  Sub 0.226 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2256  CER 0.0889  EM  48%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_1.5.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_2.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 2.0
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2105 | CER 0.0836 | Exact-match 52%
+  Sub 0.211 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2105  CER 0.0836  EM  52%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_2.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_2.5.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 2.5
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2105 | CER 0.0836 | Exact-match 52%
+  Sub 0.211 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2105  CER 0.0836  EM  52%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_2.5.jsonl
+
+$ /mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/bin/python /mnt/MORSHEDLAB/home/uutsha/Silent_Speech_EMG/inference_emg_llm.py --ckpt artifacts/best_checkpoint_llama32_1b.pt --data_dir data/val_emg --out Results_reproduced/sweep_lam/lambda_3.jsonl --decoder ns_joint_rerank --beam 48 --max_len 64 --rerank_M 192 --per_step_top 192 --alpha 0.0 --delta 5.0 --beta 0.0 --kappa 0.0 --gamma 0.45 --min_eos_len 2 --lambda_fix 2.0 --lambda0 1.9 --a 0.0 --b 0.0 --lambda_min 0.0 --lambda_max 2.0 --ctc_select_lengthnorm --normalizer artifacts/emg_norm.pkl --lexicon artifacts/lexicon.txt --train_dir_for_lm data/train_emg --lambda_fix 3.0
+/mnt/MORSHEDLAB/home/uutsha/miniforge3/envs/ss2/lib/python3.11/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+NS constraint: utterance-level grammar (years 1883-2020)
+
+Decoder: ns_joint_rerank   (50 utterances from data/val_emg)
+  WER 0.2180 | CER 0.0854 | Exact-match 50%
+  Sub 0.218 | Del 0.000 | Ins 0.000
+
+  All recorded conditions:
+    ns_joint_rerank      WER 0.2180  CER 0.0854  EM  50%
+    ar_greedy            WER 0.3459  CER 0.1341  EM  24%
+    ar_beam              WER 0.3308  CER 0.1289  EM  26%
+    ctc_greedy           WER 0.3459  CER 0.1150  EM  24%
+
+Wrote: Results_reproduced/sweep_lam/lambda_3.jsonl
+
+Done. Score the outputs with:
+  python scripts/evaluate.py --decomp --bootstrap Results_reproduced/*/*.jsonl

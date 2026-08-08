@@ -1,0 +1,4 @@
+system,n,WER,CER,EM%,ref_in_pool
+ctc_grammar_top1,50,0.2348,0.0897,46.0,
+ctc_grammar_pool_oracle,50,0.1136,0.0573,72.0,36
+ar_beam+ctc_grammar_oracle,50,0.2121,0.0935,50.0,

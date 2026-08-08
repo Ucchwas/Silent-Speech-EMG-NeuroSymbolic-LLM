@@ -1,0 +1,69 @@
+host=rpg-93-3  job=140791  gpus=1
+0, NVIDIA H100 NVL, 95830 MiB
+-----------------------------------------------------------------
+tuning artifacts/best_checkpoint_llama32_3b.pt -> artifacts/ns_tuning_llama32_3b.json
+val utterances: 50
+  searched 10/50
+  searched 20/50
+  searched 30/50
+  searched 40/50
+  searched 50/50
+
+val AR beam baseline: WER 0.3835 CER 0.1777
+
+top 15 NS (constrained beam) configs on validation:
+  K=6 m=2 beta=0.00 kappa=0.00 gamma=0.45 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.00 gamma=0.45 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.00 gamma=1.00 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.00 gamma=1.00 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.00 gamma=2.00 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.00 gamma=2.00 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.20 gamma=0.45 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.20 gamma=0.45 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.20 gamma=1.00 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.20 gamma=1.00 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.20 gamma=2.00 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.20 gamma=2.00 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.40 gamma=0.45 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.40 gamma=0.45 alpha=0.6  WER 0.3835 CER 0.1777 EM 1600%
+  K=6 m=2 beta=0.00 kappa=0.40 gamma=1.00 alpha=0.0  WER 0.3835 CER 0.1777 EM 1600%
+
+beam selection on the joint AR+CTC objective:
+  K=  6 m=2: NS-alone 0.3835  best joint 0.3383 (running best)
+  K=  6 m=4: NS-alone 0.3835  best joint 0.3383 (running best)
+  K=  6 m=8: NS-alone 0.4060  best joint 0.3383 (running best)
+  K= 12 m=2: NS-alone 0.3835  best joint 0.3233 (running best)
+  K= 12 m=4: NS-alone 0.3835  best joint 0.3233 (running best)
+  K= 12 m=8: NS-alone 0.4060  best joint 0.3233 (running best)
+  K= 24 m=2: NS-alone 0.3835  best joint 0.3233 (running best)
+  K= 24 m=4: NS-alone 0.3835  best joint 0.3233 (running best)
+  K= 24 m=8: NS-alone 0.4887  best joint 0.3233 (running best)
+  K= 48 m=2: NS-alone 0.3835  best joint 0.3233 (running best)
+  K= 48 m=4: NS-alone 0.3835  best joint 0.3233 (running best)
+  K= 48 m=8: NS-alone 0.5639  best joint 0.3233 (running best)
+
+chosen: K=12 m=2 lambda~1.0 -> joint WER 0.3233
+  ns_ctc_select length_norm=True: WER 0.3835
+  ns_ctc_select length_norm=False: WER 0.3835
+  ns_joint_rerank lambda=0.00: WER 0.3835
+  ns_joint_rerank lambda=0.05: WER 0.3759
+  ns_joint_rerank lambda=0.10: WER 0.3609
+  ns_joint_rerank lambda=0.25: WER 0.3308
+  ns_joint_rerank lambda=0.50: WER 0.3308
+  ns_joint_rerank lambda=1.00: WER 0.3233
+  ns_joint_rerank lambda=2.00: WER 0.3233
+  ns_joint_rerank lambda=4.00: WER 0.3308
+  ns_joint_rerank lambda=8.00: WER 0.3308
+  ns_joint_adaptive best: WER 0.3233 at {'lambda0': 0.9, 'a': 0.0, 'b': 0.0}
+
+=== validation ladder at tuned config ===
+  ctc_greedy           WER 0.3910 CER 0.1568 EM 2400%
+  ar_beam              WER 0.3835 CER 0.1777 EM 1600%
+  ns                   WER 0.3835 CER 0.1777 EM 1600%
+  ns_ctc_select        WER 0.3835 CER 0.1777 EM 1600%
+  ns_joint_rerank      WER 0.3233 CER 0.1394 EM 2800%
+  ns_joint_adaptive    WER 0.3233 CER 0.1429 EM 2800%
+
+tuned NS config: {"beam": 12, "min_eos_len": 2, "beta": 0.0, "kappa": 0.0, "gamma": 0.45, "alpha": 0.0, "delta": 5.0, "ctc_select_lengthnorm": true, "lambda_fix": 1.0, "lambda0": 0.9, "a": 0.0, "b": 0.0}
+wrote artifacts/ns_tuning_llama32_3b.json
+done -> artifacts/ns_tuning_llama32_3b.json

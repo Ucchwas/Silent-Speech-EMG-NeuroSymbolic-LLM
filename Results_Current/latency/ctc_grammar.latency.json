@@ -1,0 +1,7 @@
+{
+  "decoder": "ctc_grammar",
+  "n_utt": 50,
+  "ms_per_utt": 1547.7,
+  "chars_per_s": 7.9,
+  "peak_gpu_gb": 3.09
+}
