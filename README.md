@@ -1,7 +1,8 @@
 # Reducing Language-Prior Drift in EMG Silent Speech Recognition via NeuroSymbolic Constrained Decoding with LLMs
 
-Reference implementation for the TASLP manuscript
-(`TASLP_NS_Silent_Speech/conference_101719.tex`, build with `pdflatex`).
+Reference implementation for the TASLP manuscript. The manuscript sources and
+the compiled PDF are kept outside this repository; everything here is the code
+and the scored results behind its tables and figures.
 
 A compact **EMG adapter** is trained on silent facial EMG while a **decoder-only
 LLM stays frozen**. Dual supervision (autoregressive + auxiliary CTC) gives two
@@ -27,8 +28,8 @@ objective costs the same decoder 0.235 → 0.311.
 
 | path | what it is |
 |---|---|
-| `Results_reproduced/` | **authoritative.** Every number, table and figure in the manuscript regenerates from here. |
-| `Results/` | outputs from an earlier evaluation pipeline, retained only for provenance. Do not cite these. |
+| `Results_Current/` | **authoritative, and the tree shipped here.** The manuscript's tables and figures are scored from these `*.jsonl` outputs and `*.csv` summaries. |
+| `Results_reproduced/` | not shipped. `run_experiments.py` writes here by default, so a re-run lands beside the reference tree instead of overwriting it. |
 
 ---
 
@@ -59,7 +60,8 @@ scripts/
   pptx_text.py               mathtext -> Unicode runs, for the deck
   make_fig1.py               fig1_layout -> Overview_Pipeline_Adapter.png
   make_overview_pptx.py      fig1_layout -> Overview.pptx, slide 2
-  make_figures.py            Figs. 2-4 from the scored CSVs
+  make_figures.py            Fig. 2 from the scored CSVs (see Figures below)
+  make_fig_representation.py Fig. 4 from fig_representation.csv
 
 models/emg_adapter.py        EMGAdapterV2 (Sec. IV-B2)
 slurm/                       SLURM jobs; run_all.sh submits the whole graph
@@ -99,8 +101,9 @@ python inference_emg_llm.py \
 
 # 5) Score, and regenerate the figures
 python scripts/evaluate.py Results_reproduced/decoders/*.jsonl --bootstrap
-python scripts/make_fig1.py        # Fig. 1
-python scripts/make_figures.py     # Figs. 2-4
+python scripts/make_fig1.py                                  # Fig. 1
+python scripts/make_figures.py --only fig2                   # Fig. 2
+python scripts/make_fig_representation.py                    # Fig. 4
 ```
 
 To reproduce a split exactly later, pass the recorded manifest:
@@ -119,18 +122,31 @@ bash slurm/run_all.sh          # PRIMARY_TAG defaults to llama32_1b
 
 ## Figures
 
-All four are 300-600 dpi PNG, flattened to RGB, written into
-`TASLP_NS_Silent_Speech/Figures/`. The plots are drawn at the printed IEEE
-column width (3.45 in single, 7.16 in double) so `\includegraphics` never
-rescales them, and set in STIX, which is metrically Times and carries the math
-alphabet the labels use.
+All five are 300-600 dpi PNG, flattened to RGB, written into the manuscript's
+`Figures/` directory. The plots are drawn at the printed IEEE column width
+(3.45 in single, 7.16 in double) so `\includegraphics` never rescales them, and
+set in STIX, which is metrically Times and carries the math alphabet the labels
+use.
 
-| figure | file | source |
-|---|---|---|
-| 1 | `Overview_Pipeline_Adapter.png` | `scripts/fig1_layout.py` |
-| 2 | `Constraint_Placement.png` | `table2_decoders.csv`, `fig3_validity.csv`, `table5_decomp.csv` |
-| 3 | `LLM_Backbone_Bars.png` | `fig2_backbones.csv` |
-| 4 | `Sweeps.png` | `fig4_beta.csv`, `fig5_lambda.csv`, `fig4c_lambda_ar.csv` |
+| figure | file | built by | source |
+|---|---|---|---|
+| 1 | `Overview_Pipeline_Adapter.png` | `make_fig1.py` | `scripts/fig1_layout.py` |
+| 2 | `Constraint_Placement.png` | `make_figures.py --only fig2` | `table2_decoders.csv`, `fig3_validity.csv`, `table5_decomp.csv` |
+| 3 | `LLM_Backbone_Bars.png` | — | `fig2_backbones.csv` plus per-seed and bits-per-character values |
+| 4 | `Target_Representation.png` | `make_fig_representation.py` | `fig_representation.csv` |
+| 5 | `Sweeps.png` | — | `fig4_beta.csv`, `fig5_lambda.csv`, `fig4c_lambda_ar.csv` |
+
+`make_figures.py --only fig2` reproduces Fig. 2 pixel-for-pixel from
+`Results_Current/`. Its Fig. 3 and Fig. 5 code predates the shipped versions of
+those two figures, which add the per-seed dots, the bits-per-character panel and
+the validation-against-test panel; rebuilding them needs per-seed WERs and
+bits-per-character values that are not in this tree, so the committed PNGs are
+the reference for both.
+
+Fig. 4 stores its three training seeds in `fig_representation.csv` as integer
+word-error counts `k` over the 132 reference words of the test split, so each
+WER is exactly `k/132` and the plotted mean and SD agree with Table III to the
+last printed digit.
 
 Fig. 1 has an editable PowerPoint copy on **slide 2** of `Figures/Overview.pptx`
 (slide 1 is untouched; the deck as submitted is kept beside it as
@@ -191,8 +207,8 @@ python scripts/run_experiments.py --suite decoders     # Table II
 python scripts/run_experiments.py --suite supervision  # Table III
 python scripts/run_experiments.py --suite decomp       # Table IV
 python scripts/run_experiments.py --suite latency      # Table V
-python scripts/run_experiments.py --suite sweep_beta   # Fig. 4(a), validation
-python scripts/run_experiments.py --suite sweep_lam    # Fig. 4(b), validation
+python scripts/run_experiments.py --suite sweep_beta   # Fig. 5(a), validation
+python scripts/run_experiments.py --suite sweep_lam    # Fig. 5(b), validation
 
 # Fig. 3: one checkpoint per frozen backbone, same adapter + decoding recipe
 python scripts/run_experiments.py --suite backbones \
@@ -203,7 +219,7 @@ python scripts/run_experiments.py --suite backbones \
 Add `--dry_run` to print the commands without executing them. The Phase-2
 SLURM jobs (`slurm/decode_phase2.sbatch`, `latency_phase2.sbatch`,
 `backbones_phase2.sbatch`, `probe_pool.sbatch`) are what produced the
-manuscript's `Results_reproduced/` tree.
+manuscript's `Results_Current/` tree.
 
 Table V requires one job per decoder under identical flags; timings measured
 across jobs are not comparable.

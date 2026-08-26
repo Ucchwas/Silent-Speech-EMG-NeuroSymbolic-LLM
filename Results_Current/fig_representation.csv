@@ -1,0 +1,5 @@
+system,label,wer_mean,wer_sd,em_pct,seed_k,day,year,clock,num
+characters,characters,0.270,0.034,38.7,31|36|40,81.3,42.1,27.8,56.5
+verbalized_letters,verbalized letters,0.139,0.039,66.7,14|17|24,81.3,63.2,61.1,71.0
+phonemes,phonemes,0.051,0.012,86.7,5|7|8,90.6,89.5,88.9,89.9
+phonemes_no_backbone,"phonemes, no backbone",0.194,0.012,54.7,24|26|27,68.8,57.9,55.6,62.3

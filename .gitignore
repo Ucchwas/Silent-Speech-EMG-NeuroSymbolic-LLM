@@ -1,9 +1,17 @@
-# Papers
+# Manuscript sources and any built PDF stay out of the public repo
 Papers/
+TASLP_Silent_Speech_Recognition/
+*.pdf
+
+# Peer-review material is confidential: reviewer comments and the response
+# letter must never be published. *.pdf above covers only the PDF copies.
+Major Revision/
 
 # Data
 data/
 
+# Figure output directories (the manuscript's own Figures/ is already covered
+# by the folder rule above; this catches any other build location)
 Figures/
 
 # Model weight folders only
@@ -11,8 +19,6 @@ models/llama3.2-1B/
 models/llama3.2-3B/
 models/mistral-7B-v0.3/
 models/qwen2.5-3B/
-
-TASLP_NS_Silent_Speech/
 
 # Artifacts
 artifacts/
