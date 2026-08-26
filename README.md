@@ -1,22 +1,19 @@
-# Reducing Language-Prior Drift in EMG Silent Speech Recognition via NeuroSymbolic Constrained Decoding with LLMs
+# Silent Speech EMG: NeuroSymbolic Constrained Decoding with a Frozen LLM
 
-Reference implementation for the TASLP manuscript. The manuscript sources and
-the compiled PDF are kept outside this repository; everything here is the code
-and the scored results behind its tables and figures.
-
-A compact **EMG adapter** is trained on silent facial EMG while a **decoder-only
+Code and experimental results for EMG-to-text silent speech recognition. A
+compact **EMG adapter** is trained on silent facial EMG while a **decoder-only
 LLM stays frozen**. Dual supervision (autoregressive + auxiliary CTC) gives two
 decoding channels over one adapter representation:
 
 * the **language channel** — adapter → frozen LLM → AR character head;
 * the **alignment channel** — adapter → CTC head, which never touches the LLM.
 
-The paper's result is about *where* a symbolic constraint belongs. On the test
-split the AR beam is already admitted by the task grammar on **100%** of
-utterances, so lexicon and validity constraints applied there are inert: they
-leave the output byte-identical. The CTC channel violates the grammar on **40%**
-of utterances. Enforcing an utterance-level grammar **inside CTC prefix search**
-takes WER from 0.295 to **0.235** at no measurable decoding cost.
+The experiments ask *where* a symbolic constraint belongs. On the test split the
+AR beam is already admitted by the task grammar on **100%** of utterances, so
+lexicon and validity constraints applied there are inert: they leave the output
+byte-identical. The CTC channel violates the grammar on **40%** of utterances.
+Enforcing an utterance-level grammar **inside CTC prefix search** takes WER from
+0.295 to **0.235** at no measurable decoding cost.
 
 The reported system is therefore `--decoder ctc_grammar`. It does not query the
 LLM at inference, but it still needs the LLM at *training* time: dropping the AR
@@ -28,7 +25,7 @@ objective costs the same decoder 0.235 → 0.311.
 
 | path | what it is |
 |---|---|
-| `Results_Current/` | **authoritative, and the tree shipped here.** The manuscript's tables and figures are scored from these `*.jsonl` outputs and `*.csv` summaries. |
+| `Results_Current/` | **authoritative, and the tree shipped here.** All reported numbers are scored from these `*.jsonl` outputs and `*.csv` summaries. |
 | `Results_reproduced/` | not shipped. `run_experiments.py` writes here by default, so a re-run lands beside the reference tree instead of overwriting it. |
 
 ---
@@ -36,34 +33,27 @@ objective costs the same decoder 0.235 → 0.311.
 ## Layout
 
 ```
-train_emg_llm.py             training (Sec. IV-D, Table I)
-inference_emg_llm.py         all ten decoding conditions (Sec. V-B)
+train_emg_llm.py             training
+inference_emg_llm.py         all ten decoding conditions
 split_data.py                400/50/50 split, with manifest pinning
 
 scripts/
-  extract_features.py        raw EMG -> 112-dim features (Sec. III-B)
+  extract_features.py        raw EMG -> 112-dim features
   make_lexicon.py            flat word lexicon from TRAIN transcripts
-  grammar.py                 utterance grammar: induce / enumerate / verify (Alg. 1)
+  grammar.py                 utterance grammar: induce / enumerate / verify
   data_utils.py              transcript normalisation + feature z-scoring
   dataset_emg.py             dataset / collation
   augment.py                 train-time EMG augmentation
   ar_decode.py               prefix-KV-cached AR step, scoring, greedy, beam
   ns_utils.py                tries, char 5-gram, CTC forward, AR-side NS beam,
-                             and ctc_grammar_beam (Alg. 2)
+                             and the grammar-constrained CTC prefix beam
   tune_ns.py                 validation search over the decoding weights
   metrics.py                 corpus WER/CER/exact-match, decomposition, bootstrap
-  evaluate.py                turns *.jsonl outputs into the paper's tables
+  evaluate.py                turns *.jsonl outputs into scored tables
   analyze_pool.py            pool oracle + channel complementarity
   run_experiments.py         drives every experiment suite
-  fig_style.py               shared drawing primitives (auto-fitting text)
-  fig1_layout.py             Fig. 1 geometry and labels, in slide inches
-  pptx_text.py               mathtext -> Unicode runs, for the deck
-  make_fig1.py               fig1_layout -> Overview_Pipeline_Adapter.png
-  make_overview_pptx.py      fig1_layout -> Overview.pptx, slide 2
-  make_figures.py            Fig. 2 from the scored CSVs (see Figures below)
-  make_fig_representation.py Fig. 4 from fig_representation.csv
 
-models/emg_adapter.py        EMGAdapterV2 (Sec. IV-B2)
+models/emg_adapter.py        EMGAdapterV2
 slurm/                       SLURM jobs; run_all.sh submits the whole graph
 ```
 
@@ -80,7 +70,7 @@ python split_data.py --clean --write_manifest artifacts/split_manifest.json
 # 2) Symbolic resources, from TRAIN transcripts only
 python scripts/make_lexicon.py --src data/train_emg --out artifacts/lexicon.txt
 
-# 3) Train. The primary backbone is Llama-3.2-1B; Table I settings are
+# 3) Train. The primary backbone is Llama-3.2-1B; the reported settings are
 #    800 epochs, batch 8, lr 1e-4, wd 0.01, lambda_ctc 0.2, early stop 200.
 #    NOTE: train_emg_llm.py's argparse default is --epochs 400. The reported
 #    runs were launched from slurm/train.sbatch, which passes 800.
@@ -99,11 +89,8 @@ python inference_emg_llm.py \
   --beta 0.0 --max_len 64 --ctc_grammar_beam 32 --ctc_grammar_pool 8 \
   --out Results_reproduced/decoders/ctc_grammar.jsonl
 
-# 5) Score, and regenerate the figures
+# 5) Score
 python scripts/evaluate.py Results_reproduced/decoders/*.jsonl --bootstrap
-python scripts/make_fig1.py                                  # Fig. 1
-python scripts/make_figures.py --only fig2                   # Fig. 2
-python scripts/make_fig_representation.py                    # Fig. 4
 ```
 
 To reproduce a split exactly later, pass the recorded manifest:
@@ -120,70 +107,26 @@ bash slurm/run_all.sh          # PRIMARY_TAG defaults to llama32_1b
 
 ---
 
-## Figures
-
-All five are 300-600 dpi PNG, flattened to RGB, written into the manuscript's
-`Figures/` directory. The plots are drawn at the printed IEEE column width
-(3.45 in single, 7.16 in double) so `\includegraphics` never rescales them, and
-set in STIX, which is metrically Times and carries the math alphabet the labels
-use.
-
-| figure | file | built by | source |
-|---|---|---|---|
-| 1 | `Overview_Pipeline_Adapter.png` | `make_fig1.py` | `scripts/fig1_layout.py` |
-| 2 | `Constraint_Placement.png` | `make_figures.py --only fig2` | `table2_decoders.csv`, `fig3_validity.csv`, `table5_decomp.csv` |
-| 3 | `LLM_Backbone_Bars.png` | — | `fig2_backbones.csv` plus per-seed and bits-per-character values |
-| 4 | `Target_Representation.png` | `make_fig_representation.py` | `fig_representation.csv` |
-| 5 | `Sweeps.png` | — | `fig4_beta.csv`, `fig5_lambda.csv`, `fig4c_lambda_ar.csv` |
-
-`make_figures.py --only fig2` reproduces Fig. 2 pixel-for-pixel from
-`Results_Current/`. Its Fig. 3 and Fig. 5 code predates the shipped versions of
-those two figures, which add the per-seed dots, the bits-per-character panel and
-the validation-against-test panel; rebuilding them needs per-seed WERs and
-bits-per-character values that are not in this tree, so the committed PNGs are
-the reference for both.
-
-Fig. 4 stores its three training seeds in `fig_representation.csv` as integer
-word-error counts `k` over the 132 reference words of the test split, so each
-WER is exactly `k/132` and the plotted mean and SD agree with Table III to the
-last printed digit.
-
-Fig. 1 has an editable PowerPoint copy on **slide 2** of `Figures/Overview.pptx`
-(slide 1 is untouched; the deck as submitted is kept beside it as
-`Overview_submitted.pptx`):
-
-```bash
-python scripts/make_overview_pptx.py    # rewrite slide 2 as native shapes
-```
-
-Both the PNG and the slide are generated from `scripts/fig1_layout.py`, so they
-cannot drift apart. Edit the layout module and rerun both scripts; editing the
-deck by hand is fine for a one-off export, but those edits are overwritten the
-next time `make_overview_pptx.py` runs.
-
----
-
 ## Decoding conditions (`--decoder`)
 
-Grouped by the channel that produces the transcript (Sec. V-B, Table II).
+Grouped by the channel that produces the transcript.
 
 | value | condition | test WER |
 |---|---|---|
 | `ar_greedy` | greedy AR decoding (K = 1) | 0.356 |
 | `ar_beam` | AR beam search with length normalisation | 0.333 |
 | `ns` | AR beam + trie + 5-gram + boundary + EOS gating | 0.333 |
-| `ns_ctc_select` | `ns` + CTC candidate selection (Eq. 18) | 0.333 |
+| `ns_ctc_select` | `ns` + CTC candidate selection | 0.333 |
 | `ns_joint_rerank` | `ns` + joint AR/CTC reranking at fixed `lambda_fix` | 0.288 |
-| `ns_joint_adaptive` | `ns` + joint reranking + adaptive fusion (Eq. 19) | 0.288 |
+| `ns_joint_adaptive` | `ns` + joint reranking + adaptive fusion | 0.288 |
 | `ctc_greedy` | greedy collapse from the CTC head | 0.295 |
 | `ctc_lexicon` | CTC prefix beam under the flat word lexicon | 0.235 |
-| **`ctc_grammar`** | **CTC prefix beam under the utterance grammar (Alg. 2)** | **0.235** |
+| **`ctc_grammar`** | **CTC prefix beam under the utterance grammar** | **0.235** |
 | `ctc_grammar_ar` | `ctc_grammar` + AR rescoring of the valid pool | 0.265 |
 
 The first six run on the language channel; `ns` and `ns_ctc_select` are
-byte-identical to `ar_beam` on all 50 test utterances, which is the paper's
-headline null result and not a bug. `ctc_grammar_ar` wins on validation and
-loses on test; it is reported as a negative result.
+byte-identical to `ar_beam` on all 50 test utterances, which is a genuine null
+result and not a bug. `ctc_grammar_ar` wins on validation and loses on test.
 
 Component switches (all `BooleanOptionalAction`, so `--no-X` disables):
 
@@ -195,7 +138,7 @@ Component switches (all `BooleanOptionalAction`, so `--no-X` disables):
 --kappa 0 --gamma 0    # drop the boundary terms
 ```
 
-Training-supervision variants (Table III) are set at training time with
+Training-supervision variants are set at training time with
 `--supervision {ar_ctc,ar_only,ctc_only}`.
 
 ---
@@ -203,14 +146,14 @@ Training-supervision variants (Table III) are set at training time with
 ## Experiment suites
 
 ```bash
-python scripts/run_experiments.py --suite decoders     # Table II
-python scripts/run_experiments.py --suite supervision  # Table III
-python scripts/run_experiments.py --suite decomp       # Table IV
-python scripts/run_experiments.py --suite latency      # Table V
-python scripts/run_experiments.py --suite sweep_beta   # Fig. 5(a), validation
-python scripts/run_experiments.py --suite sweep_lam    # Fig. 5(b), validation
+python scripts/run_experiments.py --suite decoders     # decoding ladder
+python scripts/run_experiments.py --suite supervision  # AR / CTC / AR+CTC
+python scripts/run_experiments.py --suite decomp       # error decomposition
+python scripts/run_experiments.py --suite latency      # decoding cost
+python scripts/run_experiments.py --suite sweep_beta   # 5-gram weight, validation
+python scripts/run_experiments.py --suite sweep_lam    # AR/CTC fusion, validation
 
-# Fig. 3: one checkpoint per frozen backbone, same adapter + decoding recipe
+# One checkpoint per frozen backbone, same adapter + decoding recipe
 python scripts/run_experiments.py --suite backbones \
   --backbone_ckpt llama32_1b=artifacts/best_checkpoint_llama32_1b.pt \
   --backbone_ckpt llama32_3b=artifacts/best_checkpoint_llama32_3b.pt
@@ -219,10 +162,10 @@ python scripts/run_experiments.py --suite backbones \
 Add `--dry_run` to print the commands without executing them. The Phase-2
 SLURM jobs (`slurm/decode_phase2.sbatch`, `latency_phase2.sbatch`,
 `backbones_phase2.sbatch`, `probe_pool.sbatch`) are what produced the
-manuscript's `Results_Current/` tree.
+`Results_Current/` tree.
 
-Table V requires one job per decoder under identical flags; timings measured
-across jobs are not comparable.
+Latency measurement requires one job per decoder under identical flags; timings
+measured across jobs are not comparable.
 
 ---
 
@@ -252,9 +195,9 @@ the total number of reference words (resp. characters). Sub/Del/Ins are
 normalised the same way, so they sum exactly to the total WER. Exact-match is the
 percentage of utterances that match after transcript normalisation.
 
-This is the convention the paper's tables use. A per-utterance (macro) average
-is a different quantity and gives visibly different numbers on a 50-utterance
-set; `scripts/metrics.py` exposes it separately as `macro_wer` if you want it.
+A per-utterance (macro) average is a different quantity and gives visibly
+different numbers on a 50-utterance set; `scripts/metrics.py` exposes it
+separately as `macro_wer` if you want it.
 
 Confidence intervals are 95% percentile bootstrap over utterances (10,000
 resamples). System comparisons use a **paired** bootstrap over the same budget,

@@ -1,11 +1,27 @@
-# Manuscript sources and any built PDF stay out of the public repo
+# This repository holds code and experimental results only. Manuscript
+# sources, built documents and slide decks are kept outside it.
 Papers/
 TASLP_Silent_Speech_Recognition/
 *.pdf
+*.tex
+*.cls
+*.bib
+*.docx
+*.pptx
 
 # Peer-review material is confidential: reviewer comments and the response
 # letter must never be published. *.pdf above covers only the PDF copies.
 Major Revision/
+
+# Figure and deck production code: belongs with the manuscript, not the repo
+scripts/fig_style.py
+scripts/fig1_layout.py
+scripts/pptx_text.py
+scripts/make_fig1.py
+scripts/make_overview_pptx.py
+scripts/make_figures.py
+scripts/make_fig_representation.py
+Results_Current/fig_representation.csv
 
 # Data
 data/
